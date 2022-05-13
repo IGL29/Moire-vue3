@@ -16,7 +16,7 @@
           <img
             width="570"
             height="570"
-            :src="currentImage()"
+            :src="pictureByColor"
             srcset="img/product-square-1@2x.jpg 2x"
             alt="Название товара"
           />
@@ -26,10 +26,10 @@
       <div class="item__info">
         <span class="item__code">Артикул: {{ product.id }}</span>
         <h2 class="item__title">
-          {{ product.title }}
+          {{ title }}
         </h2>
         <div class="item__form">
-          <form class="form" action="#" method="POST" @submit.prevent="addProductToCart">
+          <form class="form" action="#" method="POST" @submit.prevent="doAddProductToCart">
             <div class="item__row item__row--center">
               <CounterInput v-model:number="quantityProducts" />
 
@@ -93,9 +93,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import {
+  ref, computed, watch, onCreated,
+} from 'vue';
+import { useRoute } from 'vue-router';
+import { useStore, mapGetters } from 'vuex';
 import AboutProductTabs from '@/components/AboutProductTabs.vue';
-import changeImageMixin from '@/mixins/changeImageMixin.vue';
+import useChangeImage from '@/utils/changeImage';
 import NotifyMessage from '@/components/NotifyMessage.vue';
 import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import CounterInput from '@/components/CounterInput.vue';
@@ -104,110 +108,203 @@ import ErrorNotify from '@/components/ErrorNotify.vue';
 
 export default {
   name: 'ProductPage',
-
-  mixins: [changeImageMixin],
-
-  data() {
-    return {
-      selectedColorId: '',
-      selectedSizeId: '',
-      quantityProducts: 1,
-      loadingProduct: false,
-      errorResponse: false,
-    };
-  },
-
-  computed: {
-    ...mapGetters([
-      'successfulRequestNotify',
-      'errorRequestNotify',
-    ]),
-
-    product() {
-      return this.$store.state.productData;
-    },
-
-    category() {
-      if (this.product?.category?.title) {
-        return this.product.category.title;
-      }
-      return 'Категория';
-    },
-
-    title() {
-      if (this.product?.title) {
-        return this.product.title;
-      }
-      return 'Название товара';
-    },
-  },
-
-  methods: {
-    loadProduct() {
-      this.loadingProduct = true;
-      this.errorResponse = false;
-      const { slug } = this.$route.params;
-      this.$store
-        .dispatch('loadProductData', { slug })
-        .then(() => {
-          this.loadingProduct = false;
-          this.errorResponse = false;
-        })
-        .catch(() => {
-          this.loadingProduct = false;
-          this.errorResponse = true;
-        });
-    },
-
-    addProductToCart() {
-      this.$store.dispatch('addProductToCart', {
-        productId: this.product.id,
-        colorId: this.selectedColorId,
-        sizeId: this.selectedSizeId,
-        quantity: this.quantityProducts,
-      })
-        .then(() => {
-          this.$store.commit('showNotifySuccess');
-        })
-        .catch(() => {
-          this.$store.commit('showNotifyError');
-        });
-    },
-
-    setDefaultColor() {
-      const defaultColor = this.product.colors[0].color.id;
-      if (defaultColor) {
-        this.selectedColorId = defaultColor;
-      }
-    },
-
-    setDefaultSize() {
-      const defaultSize = this.product.sizes[0].id;
-      if (defaultSize) {
-        this.selectedSizeId = defaultSize;
-      }
-    },
-  },
-
-  components: {
-    BreadCrumbs,
-    CounterInput,
-    LoaderElement,
-    ErrorNotify,
-    NotifyMessage,
-    AboutProductTabs,
-  },
-
-  watch: {
-    product() {
-      this.setDefaultColor();
-      this.setDefaultSize();
-    },
-  },
-
-  created() {
-    this.$store.commit('clearTimerNotify');
-    this.loadProduct();
-  },
 };
+</script>
+
+<script setup>
+// data
+const selectedColorId = ref('');
+const selectedSizeId = ref('');
+const quantityProducts = ref(1);
+const loadingProduct = ref(false);
+const errorResponse = ref(false);
+
+const $route = useRoute();
+const $store = useStore();
+
+// methods
+const doLoadProduct = () => {
+  loadingProduct.value = true;
+  errorResponse.value = false;
+  const { slug } = $route.params;
+  this.$store
+    .dispatch('loadProductData', { slug })
+    .then(() => {
+      loadingProduct.value = false;
+      errorResponse.value = false;
+    })
+    .catch(() => {
+      loadingProduct.value = false;
+      errorResponse.value = true;
+    });
+};
+
+const doAddProductToCart = () => {
+  this.$store.dispatch('addProductToCart', {
+    productId: product.value.id,
+    colorId: selectedColorId.value,
+    sizeId: selectedSizeId.value,
+    quantity: quantityProducts.value,
+  })
+    .then(() => {
+      $store.commit('showNotifySuccess');
+    })
+    .catch(() => {
+      $store.commit('showNotifyError');
+    });
+};
+
+const doSetDefaultColor = () => {
+  const defaultColor = product.value.colors[0].color.id;
+  if (defaultColor) {
+    selectedColorId.value = defaultColor;
+  }
+};
+
+const doSetDefaultSize = () => {
+  const defaultSize = product.value.sizes[0].id;
+  if (defaultSize) {
+    selectedSizeId.value = defaultSize;
+  }
+};
+
+// export default {
+// name: 'ProductPage',
+
+// mixins: [changeImageMixin],
+
+// MIXIN or Reused function
+
+// data() {
+//   return {
+//     selectedColorId: '',
+//     selectedSizeId: '',
+//     quantityProducts: 1,
+//     loadingProduct: false,
+//     errorResponse: false,
+//   };
+// },
+
+// ??????????????????????????
+const { successfulRequestNotify, errorRequestNotify } = mapGetters();
+
+const product = computed(() => $store.state.productData);
+
+const pictureByColor = useChangeImage(product.value, selectedColorId);
+
+const category = computed(() => {
+  if (product.value?.category?.title) {
+    return product.value.category.title;
+  }
+  return 'Категория';
+});
+
+const title = computed(() => {
+  if (product.value?.title) {
+    return product.value.title;
+  }
+  return 'Название товара';
+});
+
+// computed: {
+// ...mapGetters([
+//   'successfulRequestNotify',
+//   'errorRequestNotify',
+// ]),
+
+// product() {
+//   return this.$store.state.productData;
+// },
+
+// category() {
+//   if (this.product?.category?.title) {
+//     return this.product.category.title;
+//   }
+//   return 'Категория';
+// },
+
+// title() {
+//   if (this.product?.title) {
+//     return this.product.title;
+//   }
+//   return 'Название товара';
+// },
+// },
+
+// methods: {
+// doLoadProduct() {
+//   this.loadingProduct = true;
+//   this.errorResponse = false;
+//   const { slug } = this.$route.params;
+//   this.$store
+//     .dispatch('loadProductData', { slug })
+//     .then(() => {
+//       this.loadingProduct = false;
+//       this.errorResponse = false;
+//     })
+//     .catch(() => {
+//       this.loadingProduct = false;
+//       this.errorResponse = true;
+//     });
+// },
+
+// doAddProductToCart() {
+//   this.$store.dispatch('doAddProductToCart', {
+//     productId: this.product.id,
+//     colorId: this.selectedColorId,
+//     sizeId: this.selectedSizeId,
+//     quantity: this.quantityProducts,
+//   })
+//     .then(() => {
+//       this.$store.commit('showNotifySuccess');
+//     })
+//     .catch(() => {
+//       this.$store.commit('showNotifyError');
+//     });
+// },
+
+// doSetDefaultColor() {
+//   const defaultColor = this.product.colors[0].color.id;
+//   if (defaultColor) {
+//     this.selectedColorId = defaultColor;
+//   }
+// },
+
+// doSetDefaultSize() {
+//   const defaultSize = this.product.sizes[0].id;
+//   if (defaultSize) {
+//     this.selectedSizeId = defaultSize;
+//   }
+// },
+// },
+
+// components: {
+//   BreadCrumbs,
+//   CounterInput,
+//   LoaderElement,
+//   ErrorNotify,
+//   NotifyMessage,
+//   AboutProductTabs,
+// },
+
+watch((product) => {
+  doSetDefaultColor();
+  doSetDefaultSize();
+});
+
+// watch: {
+//   product() {
+
+//   },
+// },
+
+onCreated(() => {
+  $store.commit('clearTimerNotify');
+  doLoadProduct();
+});
+
+// created() {
+
+// },
+// };
 </script>

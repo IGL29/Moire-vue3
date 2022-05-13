@@ -25,31 +25,35 @@
           :loading="loadingProducts"
         />
 
-        <div class="teleport-target" />
-
         <ProductsPagination />
 
-        <router-link :to="{ name: 'cart' }" title="Перейти в корзину">
-          <NotifyMessage
-            :showMessage="successfulRequestNotify"
-            text="Товар добавлен в корзину"
-          />
-        </router-link>
+        <Teleport v-if="isMounted" to=".notify-teleport-target">
+          <router-link :to="{ name: 'cart' }" title="Перейти в корзину">
+            <NotifyMessage
+              :showMessage="successfulRequestNotify"
+              text="Товар добавлен в корзину"
+              />
+          </router-link>
+        </Teleport>
 
-        <NotifyMessage
-          :showMessage="errorRequestNotify"
-          text="Произошла ошибка при добавлении товара"
-        />
+        <Teleport v-if="isMounted" to=".notify-teleport-target">
+          <NotifyMessage
+            :showMessage="errorRequestNotify"
+            text="Произошла ошибка при добавлении товара"
+          />
+        </Teleport>
       </section>
     </div>
+
+    <div class="notify-teleport-target" />
   </main>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineAsyncComponent, defineComponent, h } from 'vue';
 import { mapGetters } from 'vuex';
-import declinationMixin from '@/mixins/declinationMixin.vue';
-import NotifyMessage from '@/components/NotifyMessage.vue';
+import declinationMixin from '@/utils/declinationMixin.vue';
+// import NotifyMessage from '@/components/NotifyMessage.vue';
 import InputNumberItems from '@/components/InputNumberItems.vue';
 import FilterForm from '@/components/FilterForm.vue';
 import ProductsPagination from '@/components/ProductsPagination.vue';
@@ -62,6 +66,7 @@ export default defineComponent({
 
   data() {
     return {
+      isMounted: false,
       errorRequest: false,
       loadingProducts: false,
     };
@@ -95,12 +100,21 @@ export default defineComponent({
     FilterForm,
     ProductsPagination,
     ProductsList,
-    NotifyMessage,
+    NotifyMessage: defineAsyncComponent({
+      loader: () => import('@/components/NotifyMessage.vue'),
+      delay: 0, // loader display time (between begin loading and loadingComponent)
+      loadingComponent: () => h('div', 'Загрузка'), // asyncComponent loading dasplay сomponent
+    }),
   },
 
   created() {
     this.$store.commit('clearTimerNotify');
     this.getProducts();
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.isMounted = true;
+    });
   },
 });
 </script>

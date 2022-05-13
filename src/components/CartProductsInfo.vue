@@ -17,7 +17,7 @@
 
 <script>
 import OrderList from '@/components/OrderList.vue';
-import declinationMixin from '@/mixins/declinationMixin.vue';
+import declinationMixin from '@/utils/declinationMixin.vue';
 
 export default {
   name: 'CartProductsInfo',

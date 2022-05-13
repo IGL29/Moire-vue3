@@ -80,7 +80,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import declinationMixin from '@/mixins/declinationMixin.vue';
+import declinationMixin from '@/utils/declinationMixin.vue';
 import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import ProductsNotFound from '@/components/ProductsNotFound.vue';
 import ErrorNotify from '@/components/ErrorNotify.vue';

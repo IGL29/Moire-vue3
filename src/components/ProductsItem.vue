@@ -20,7 +20,7 @@
       :to="{ name: 'product', params: { slug: product.slug } }"
       class="catalog__pic"
     >
-      <img :src="currentImage()" :alt="product.title" />
+      <!-- <img :src="currentImage()" :alt="product.title" /> -->
     </router-link>
 
     <div class="catalog__wrapper">
@@ -45,16 +45,25 @@
 </template>
 
 <script>
-import changeImageMixin from '@/mixins/changeImageMixin.vue';
+// import changeImageMixin from '@/mixins/changeImageMixin.vue';
+import { defineComponent } from 'vue';
 import ProductColors from '@/components/ProductColors.vue';
+// import useChangeImage from '@/utils/changeImage';
 
-export default {
+export default defineComponent({
   name: 'ProductsItem',
 
   props: ['product'],
 
-  mixins: [changeImageMixin],
+  // mixins: [changeImageMixin],
   components: { ProductColors },
+
+  // setup() {
+  //   // const props = defineProps(['product']);
+  //   const changeImage = useChangeImage(this.product, this.selectedColorId);
+
+  //   return (changeImage);
+  // },
 
   data() {
     return {
@@ -110,5 +119,5 @@ export default {
   created() {
     this.currentColor();
   },
-};
+});
 </script>

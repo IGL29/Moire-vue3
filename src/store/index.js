@@ -310,8 +310,6 @@ export default createStore({
       axios
         .get(`${API_BASE_URL}/api/users/accessKey`)
         .then((response) => {
-          // eslint-disable-next-line no-console
-          console.log(response);
           context.commit('saveAccessKey', response.data);
         });
     },
