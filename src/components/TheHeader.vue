@@ -29,9 +29,8 @@ import CartIndicator from '@/components/CartIndicator.vue';
 
 export default {
   name: 'TheHeader',
-
-  components: {
-    CartIndicator,
-  },
 };
+</script>
+
+<script setup>
 </script>

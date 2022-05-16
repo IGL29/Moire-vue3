@@ -120,50 +120,79 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
 
 export default {
   name: 'FilterForm',
-
-  computed: {
-    ...mapGetters([
-      'filters',
-      'materials',
-      'seasons',
-      'categories',
-      'colors',
-    ]),
-
-    filterFieldsNotEmpty() {
-      return Object.values(this.filters).some((filter) => {
-        if (Array.isArray(filter)) {
-          return filter.length;
-        }
-        return filter;
-      });
-    },
-  },
-
-  methods: {
-    ...mapActions({
-      getMaterials: 'loadMaterialsData',
-      getSeasons: 'loadSeasonsData',
-      getCategories: 'loadCategoriesData',
-      getColors: 'loadColorsData',
-      filterProducts: 'loadProductsData',
-    }),
-
-    resetFilter() {
-      this.$store.commit('resetFilter');
-      this.filterProducts();
-    },
-  },
-
-  mounted() {
-    this.getMaterials();
-    this.getSeasons();
-    this.getCategories();
-    this.getColors();
-  },
 };
+</script>
+
+<script setup>
+const $store = useStore();
+
+const filters = computed(() => $store.getters.filters);
+const materials = computed(() => $store.getters.materials);
+const seasons = computed(() => $store.getters.seasons);
+const categories = computed(() => $store.getters.categories);
+const colors = computed(() => $store.getters.colors);
+
+const filterFieldsNotEmpty = computed(() => Object.values(filters.value).some((filter) => {
+  if (Array.isArray(filter)) {
+    return filter.length;
+  }
+  return filter;
+}));
+
+// computed: {
+//   ...mapGetters([
+//     'filters',
+//     'materials',
+//     'seasons',
+//     'categories',
+//     'colors',
+//   ]),
+
+//   filterFieldsNotEmpty() {
+//     return Object.values(this.filters).some((filter) => {
+//       if (Array.isArray(filter)) {
+//         return filter.length;
+//       }
+//       return filter;
+//     });
+//   },
+// },
+
+const getMaterials = () => $store.dispatch('loadMaterialsData');
+const getSeasons = () => $store.dispatch('loadSeasonsData');
+const getCategories = () => $store.dispatch('loadCategoriesData');
+const getColors = () => $store.dispatch('loadColorsData');
+const filterProducts = () => $store.dispatch('loadProductsData');
+
+const resetFilter = () => {
+  $store.commit('resetFilter');
+  filterProducts();
+};
+
+// methods: {
+//   ...mapActions({
+//     getMaterials: 'loadMaterialsData',
+//     getSeasons: 'loadSeasonsData',
+//     getCategories: 'loadCategoriesData',
+//     getColors: 'loadColorsData',
+//     filterProducts: 'loadProductsData',
+//   }),
+
+//   resetFilter() {
+//     this.$store.commit('resetFilter');
+//     this.filterProducts();
+//   },
+// },
+
+onMounted(() => {
+  getMaterials();
+  getSeasons();
+  getCategories();
+  getColors();
+});
 </script>

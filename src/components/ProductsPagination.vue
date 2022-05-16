@@ -39,49 +39,40 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 
 export default {
   name: 'ProductsPagination',
+};
+</script>
 
-  computed: {
-    ...mapGetters([
-      'numberPages',
-      'currentPage',
-    ]),
+<script setup>
+const $store = useStore();
 
-    allowedGoToNextPage() {
-      return this.numberPages > this.currentPage;
-    },
+const currentPage = computed(() => $store.getters.currentPage);
 
-    allowedGoToPrevPage() {
-      return this.currentPage > 1;
-    },
-  },
+const addClassActivePage = (page) => page === currentPage.value;
 
-  methods: {
-    addClassActivePage(page) {
-      return page === this.currentPage;
-    },
+const goToPage = (page) => {
+  $store.commit('updateCurrentPage', page);
+  $store.dispatch('loadProductsData');
+};
 
-    goToPage(page) {
-      this.$store.commit('updateCurrentPage', page);
-      this.$store.dispatch('loadProductsData');
-    },
+const numberPages = computed(() => $store.getters.numberPages);
+const allowedGoToNextPage = computed(() => numberPages.value > currentPage.value);
+const goToNextPage = () => {
+  if (allowedGoToNextPage.value) {
+    $store.commit('updateCurrentPage', currentPage.value + 1);
+    $store.dispatch('loadProductsData');
+  }
+};
 
-    goToNextPage() {
-      if (this.allowedGoToNextPage) {
-        this.$store.commit('updateCurrentPage', this.currentPage + 1);
-        this.$store.dispatch('loadProductsData');
-      }
-    },
-
-    goToPrevPage() {
-      if (this.allowedGoToPrevPage) {
-        this.$store.commit('updateCurrentPage', this.currentPage - 1);
-        this.$store.dispatch('loadProductsData');
-      }
-    },
-  },
+const allowedGoToPrevPage = computed(() => currentPage.value > 1);
+const goToPrevPage = () => {
+  if (allowedGoToPrevPage.value) {
+    $store.commit('updateCurrentPage', currentPage.value - 1);
+    $store.dispatch('loadProductsData');
+  }
 };
 </script>

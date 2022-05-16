@@ -2,69 +2,50 @@
   <div class="content__form-container form-container">
   <form class="form-container__form">
       <span class="form-container__span">Количество товаров на странице:</span>
-      <label class="form-container__label">
+      <label v-for="number, index in prevNumbers" :key="index" class="form-container__label">
         <input
           class="form-container__input"
           type="radio"
           name="prevNumberProduct"
-          :value="12"
+          :value="number"
           v-model="numberItems"
         >
-        <span class="form-container__number">12</span>
-      </label>
-
-      <label class="form-container__label">
-        <input
-          class="form-container__input"
-          type="radio"
-          name="prevNumberProduct"
-          :value="24"
-          v-model="numberItems"
-        >
-        <span class="form-container__number">24</span>
-      </label>
-
-      <label class="form-container__label">
-        <input
-          class="form-container__input"
-          type="radio"
-          name="prevNumberProduct"
-          :value="32"
-          v-model="numberItems"
-        >
-        <span class="form-container__number">32</span>
+        <span class="form-container__number">{{ number }}</span>
       </label>
   </form>
 </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { defineProps, defineEmits, computed } from 'vue';
+import { useStore } from 'vuex';
 
 export default {
   name: 'InputNumberItems',
-
-  props: ['loading', 'error'],
-
-  computed: {
-    ...mapGetters([
-      'numberPrevProducts',
-    ]),
-
-    numberItems: {
-      get() {
-        return this.numberPrevProducts;
-      },
-      set(value) {
-        this.$emit('error', false);
-        this.$emit('loading', true);
-        this.$store.commit('updateNumberPrevProducts', value);
-        this.$store.dispatch('loadProductsData')
-          .catch(() => { this.$emit('error', true); })
-          .finally(() => { this.$emit('loading', false); });
-      },
-    },
-  },
-
 };
+</script>
+
+<script setup>
+const $store = useStore();
+
+const emits = defineEmits(['update:loading', 'update:error']);
+
+defineProps(['loading', 'error']);
+
+const prevNumbers = [12, 24, 32];
+
+const numberPrevProducts = computed(() => $store.getters.numberPrevProducts);
+const numberItems = computed({
+  get() {
+    return numberPrevProducts.value;
+  },
+  set(value) {
+    emits('update:error', false);
+    emits('update:loading', true);
+    $store.commit('updateNumberPrevProducts', value);
+    $store.dispatch('loadProductsData')
+      .catch(() => { emits('update:error', true); })
+      .finally(() => { emits('update:loading', false); });
+  },
+});
 </script>

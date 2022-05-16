@@ -5,15 +5,14 @@
 </template>
 
 <script>
+import { defineProps } from 'vue';
 import OrderItem from '@/components/OrderItem.vue';
 
 export default {
   name: 'OrderList',
-
-  props: ['products'],
-
-  components: {
-    OrderItem,
-  },
 };
+</script>
+
+<script setup>
+defineProps('products');
 </script>

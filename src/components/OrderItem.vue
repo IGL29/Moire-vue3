@@ -7,9 +7,13 @@
 </template>
 
 <script>
+import { defineProps } from 'vue';
+
 export default {
   name: 'OrderItem',
-
-  props: ['product'],
 };
+</script>
+
+<script setup>
+defineProps(['product']);
 </script>

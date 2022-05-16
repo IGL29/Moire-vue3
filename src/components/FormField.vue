@@ -20,30 +20,27 @@
 </template>
 
 <script>
+import { defineProps, defineEmits, computed } from 'vue';
 import FieldInput from '@/components/FieldInput.vue';
 import ErrorField from '@/components/ErrorField.vue';
 import FieldTextarea from '@/components/FieldTextarea.vue';
 
 export default {
   name: 'FormField',
-
-  props: ['formElement', 'label', 'placeholder', 'type', 'modalValue', 'errorText'],
-
-  computed: {
-    dataInput: {
-      get() {
-        return this.modalValue;
-      },
-      set(value) {
-        return this.$emit('update:modalValue', value);
-      },
-    },
-  },
-
-  components: {
-    FieldInput,
-    ErrorField,
-    FieldTextarea,
-  },
 };
+</script>
+
+<script setup>
+const props = defineProps(['formElement', 'label', 'placeholder', 'type', 'modalValue', 'errorText']);
+
+defineEmits(['update:modalValue']);
+
+const dataInput = computed({
+  get() {
+    return props.modalValue;
+  },
+  set(value) {
+    return this.$emit('update:modalValue', value);
+  },
+});
 </script>

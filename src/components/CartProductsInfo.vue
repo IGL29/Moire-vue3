@@ -6,7 +6,7 @@
     <p>Доставка: <b>{{ deliveryPrice }}</b></p>
     <p>Итого:
       <b>{{ numberProducts }}</b>
-      {{ declinationMixin(numberProducts, ['товар', 'товара', 'товаров']) }} на сумму
+      {{ countProducts }} на сумму
       <b>{{ totalPrice }} ₽</b>
     </p>
   </div>
@@ -16,18 +16,16 @@
 </template>
 
 <script>
+import { defineProps, computed } from 'vue';
 import OrderList from '@/components/OrderList.vue';
-import declinationMixin from '@/utils/declinationMixin.vue';
+import useDeclination from '@/composables/useDeclination';
 
 export default {
   name: 'CartProductsInfo',
-
-  mixins: [declinationMixin],
-
-  props: ['products', 'numberProducts', 'totalPrice', 'deliveryPrice'],
-
-  components: {
-    OrderList,
-  },
 };
+</script>
+
+<script setup>
+const props = defineProps(['products', 'numberProducts', 'totalPrice', 'deliveryPrice']);
+const countProducts = computed(() => useDeclination(props.numberProducts, ['товар', 'товара', 'товаров']));
 </script>

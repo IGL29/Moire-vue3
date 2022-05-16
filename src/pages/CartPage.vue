@@ -18,7 +18,7 @@
 
         <span class="content__info">
           {{ numberProducts }}
-          {{ declinationMixin(numberProducts, ['товар', 'товара', 'товаров']) }}
+          {{ countProducts }}
         </span>
       </div>
     </div>
@@ -66,12 +66,12 @@
       </form>
 
       <NotifyMessage
-        :showMessage="successfulRequestNotify"
+        v-if="successfulRequestNotify"
         text="Товар удален из корзины"
       />
 
       <NotifyMessage
-        :showMessage="errorRequestNotify"
+        v-if="errorRequestNotify"
         text="Произошла ошибка при удалении товара"
       />
     </section>
@@ -79,8 +79,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import declinationMixin from '@/utils/declinationMixin.vue';
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
+import useDeclination from '@/composables/useDeclination';
 import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import ProductsNotFound from '@/components/ProductsNotFound.vue';
 import ErrorNotify from '@/components/ErrorNotify.vue';
@@ -90,54 +91,36 @@ import NotifyMessage from '@/components/NotifyMessage.vue';
 
 export default {
   name: 'CartPage',
-
-  mixins: [declinationMixin],
-
-  data() {
-    return {
-      loadingCart: false,
-      errorRequest: false,
-      messageCartEmpty: 'Корзина пуста...',
-    };
-  },
-
-  computed: {
-    ...mapGetters({
-      productsCart: 'basketData',
-      totalPrice: 'totalPriceCart',
-      numberProducts: 'numberProductsInCart',
-      successfulRequestNotify: 'successfulRequestNotify',
-      errorRequestNotify: 'errorRequestNotify',
-    }),
-  },
-
-  methods: {
-    getProducts() {
-      this.loadingCart = true;
-      this.errorRequest = false;
-      this.$store.dispatch('loadBasketData')
-        .then(() => {
-          this.loadingCart = false;
-        })
-        .catch(() => {
-          this.loadingCart = false;
-          this.errorRequest = true;
-        });
-    },
-  },
-
-  components: {
-    LoaderElement,
-    ErrorNotify,
-    CartItem,
-    BreadCrumbs,
-    ProductsNotFound,
-    NotifyMessage,
-  },
-
-  created() {
-    this.$store.commit('clearTimerNotify');
-    this.getProducts();
-  },
 };
+</script>
+
+<script setup>
+const $store = useStore();
+const messageCartEmpty = 'Корзина пуста...';
+
+const productsCart = computed(() => $store.getters.basketData);
+const totalPrice = computed(() => $store.getters.totalPriceCart);
+const numberProducts = computed(() => $store.getters.numberProductsInCart);
+const successfulRequestNotify = computed(() => $store.getters.successfulRequestNotify);
+const errorRequestNotify = computed(() => $store.getters.errorRequestNotify);
+
+const countProducts = computed(() => useDeclination(numberProducts, ['товар', 'товара', 'товаров']));
+
+const loadingCart = ref(false);
+const errorRequest = ref(false);
+const getProducts = () => {
+  loadingCart.value = true;
+  errorRequest.value = false;
+  $store.dispatch('loadBasketData')
+    .then(() => {
+      loadingCart.value = false;
+    })
+    .catch(() => {
+      loadingCart.value = false;
+      errorRequest.value = true;
+    });
+};
+
+$store.commit('clearTimerNotify');
+getProducts();
 </script>

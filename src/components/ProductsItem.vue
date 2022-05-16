@@ -6,7 +6,7 @@
       title="Добавить в корзину"
       @click.prevent="addProductToCart"
     >
-      <svg width="24" height="24" v-if="loading">
+      <svg width="24" height="24" v-if="isLoadingFetchProduct || isLoadingPostProductToCart">
         <use xlink:href="#icon-loading"></use>
       </svg>
 
@@ -45,79 +45,51 @@
 </template>
 
 <script>
-// import changeImageMixin from '@/mixins/changeImageMixin.vue';
-import { defineComponent } from 'vue';
+import { ref, computed, defineProps } from 'vue';
+import { useStore } from 'vuex';
 import ProductColors from '@/components/ProductColors.vue';
-// import useChangeImage from '@/utils/changeImage';
+import useAddProductToCart from '../composables/useAddProductToCart';
+// import useChangeImage from '@/composables/useChangeImage';
 
-export default defineComponent({
+export default {
   name: 'ProductsItem',
+};
+</script>
 
-  props: ['product'],
+<script setup>
+const $store = useStore();
 
-  // mixins: [changeImageMixin],
-  components: { ProductColors },
+const props = defineProps(['product']);
 
-  // setup() {
-  //   // const props = defineProps(['product']);
-  //   const changeImage = useChangeImage(this.product, this.selectedColorId);
+const isLoadingFetchProduct = ref(false);
 
-  //   return (changeImage);
-  // },
+const firstColorOption = computed(() => props.product.colors[0].color.id);
+const productsInCart = computed(() => $store.getters.basketData);
+const selectedColorId = ref('');
+const productStatus = computed(() => productsInCart.value.some((productInCart) => (
+  (productInCart.product.id === props.product.id
+  && Number(productInCart.color.color.id) === Number(selectedColorId.value))
+)));
+const currentColor = () => {
+  if (!selectedColorId.value && firstColorOption.value) {
+    selectedColorId.value = firstColorOption.value;
+  }
+};
 
-  data() {
-    return {
-      selectedColorId: '',
-      loading: false,
-    };
-  },
+const { postProductToCart, isLoading: isLoadingPostProductToCart } = useAddProductToCart();
+const addProductToCart = async () => {
+  isLoadingFetchProduct.value = true;
+  const product = await $store.dispatch('loadProductData', { slug: props.product.slug });
+  const selectedSizeId = product.sizes[0].id;
+  isLoadingFetchProduct.value = false;
 
-  computed: {
-    firstColorOption() {
-      return this.product.colors[0].color.id;
-    },
+  postProductToCart({
+    productId: props.product.id,
+    colorId: selectedColorId.value,
+    sizeId: selectedSizeId,
+    quantity: 1,
+  });
+};
 
-    productsInCart() {
-      return this.$store.getters.basketData;
-    },
-
-    productStatus() {
-      return this.productsInCart.some((productInCart) => (
-        (productInCart.product.id === this.product.id
-        && Number(productInCart.color.color.id) === Number(this.selectedColorId))
-      ));
-    },
-  },
-
-  methods: {
-    currentColor() {
-      if (!this.selectedColorId && this.firstColorOption) {
-        this.selectedColorId = this.firstColorOption;
-      }
-    },
-
-    async addProductToCart() {
-      this.loading = true;
-      const product = await this.$store.dispatch('loadProductData', { slug: this.product.slug });
-      const selectedSizeId = product.sizes[0].id;
-      this.$store.dispatch('addProductToCart', {
-        productId: this.product.id,
-        colorId: this.selectedColorId,
-        sizeId: selectedSizeId,
-        quantity: 1,
-      })
-        .then(() => {
-          this.loading = false;
-          this.$store.commit('showNotifySuccess');
-        })
-        .catch(() => {
-          this.$store.commit('showNotifyError');
-        });
-    },
-  },
-
-  created() {
-    this.currentColor();
-  },
-});
+currentColor();
 </script>

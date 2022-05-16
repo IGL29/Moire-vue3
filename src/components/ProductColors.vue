@@ -1,6 +1,6 @@
 <template>
 <ul class="colors colors--black">
-  <li class="colors__item" v-for="color of colors" :key="color.color.id" :ref="fillref">
+  <li class="colors__item" v-for="color of colors" :key="color.color.id" :ref="doFillRef">
     <label class="colors__label">
       <input
         class="colors__radio sr-only"
@@ -16,42 +16,35 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import {
+  defineProps, defineEmits, reactive, computed, onBeforeUpdate,
+} from 'vue';
 
-export default defineComponent({
+export default {
   name: 'ProductColors',
-  props: ['colors', 'productSlug', 'modelValue'],
-  // all emits of current component
-  emits: ['update:modelValue'],
-  data() {
-    return {
-      productsElement: [],
-    };
-  },
+};
+</script>
 
-  computed: {
-    firstColorOption() {
-      return this.modelValue || this.colors[0].color.id;
-    },
-    changeColor: {
-      get() {
-        return this.modelValue;
-      },
-      set(value) {
-        this.$emit('update:modelValue', value);
-      },
-    },
+<script setup>
+const props = defineProps(['colors', 'productSlug', 'modelValue']);
+
+const emits = defineEmits(['update:modelValue']);
+const changeColor = computed({
+  get() {
+    return props.modelValue;
   },
-  methods: {
-    // used refs with v-for
-    fillref(element) {
-      if (element) {
-        this.productsElement.push(element);
-      }
-    },
+  set(value) {
+    emits('update:modelValue', value);
   },
-  beforeUpdate() {
-    this.productsElement = [];
-  },
+});
+
+let productsElement = reactive([]);
+const doFillRef = (element) => {
+  if (element) {
+    productsElement.push(element);
+  }
+};
+onBeforeUpdate(() => {
+  productsElement = [];
 });
 </script>
