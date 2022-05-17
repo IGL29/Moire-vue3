@@ -52,16 +52,17 @@
           </p>
           <p class="cart__price">Итого: <span>{{ totalPrice }} ₽</span></p>
 
-          <router-link :to="{ name: 'order' }"
-            v-slot="{navigate}"
-            type="submit"
-            v-show="numberProducts"
-            custom
-          >
-              <button class="cart__button button button--primery" @click="navigate">
+          <template v-if="numberProducts">
+            <router-link :to="{ name: 'order' }"
+              v-slot="{navigate}"
+              custom
+            >
+              <button
+                type="submit" class="cart__button button button--primery" @click="navigate">
                 Оформить заказ
               </button>
           </router-link>
+          </template>
         </div>
       </form>
 

@@ -13,13 +13,15 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
 export default {
   name: 'CartIndicator',
-
-  computed: {
-    numberProducts() {
-      return this.$store.getters.numberProductsInCart;
-    },
-  },
 };
+</script>
+
+<script setup>
+const $store = useStore();
+const numberProducts = computed(() => $store.getters.numberProductsInCart);
 </script>

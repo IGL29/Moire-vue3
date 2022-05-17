@@ -15,7 +15,7 @@
       name="count"
       @input="enteringNumber"
       @focusout="enteringNumFocusOut"
-      v-model.number="quantity"
+      v-model.number="dataValue"
     />
 
     <button
@@ -31,38 +31,39 @@
 </template>
 
 <script>
+import {
+  defineProps, defineEmits, ref,
+} from 'vue';
 
 export default {
   name: 'CounterInput',
+};
+</script>
 
-  props: ['number'],
-  data() {
-    return {
-      quantity: this.number,
-    };
-  },
+<script setup>
+const props = defineProps(['modelValue']);
+const emits = defineEmits(['update:modelValue']);
+const dataValue = ref(props.modelValue ?? 0);
 
-  methods: {
-    decrement() {
-      if (this.quantity > 1) {
-        this.$emit('update:number', this.quantity -= 1);
-      }
-    },
+const decrement = () => {
+  if (dataValue.value > 1) {
+    emits('update:modelValue', dataValue.value -= 1);
+  }
+};
 
-    increment() {
-      this.$emit('update:number', this.quantity += 1);
-    },
+const increment = () => {
+  emits('update:modelValue', dataValue.value += 1);
+};
 
-    enteringNumber() {
-      if (this.inputValue >= 1) {
-        this.$emit('update:number', this.quantity);
-      }
-    },
-    enteringNumFocusOut() {
-      if (this.quantity < 1) {
-        this.quantity = this.number;
-      }
-    },
-  },
+const enteringNumber = () => {
+  if (dataValue.value > 0) {
+    emits('update:modelValue', dataValue.value);
+  }
+};
+
+const enteringNumFocusOut = () => {
+  if (dataValue.value < 1) {
+    dataValue.value = props.modelValue;
+  }
 };
 </script>

@@ -3,20 +3,23 @@
 </template>
 
 <script>
+import { defineProps, defineEmits, computed } from 'vue';
+
 export default {
   name: 'FieldInput',
-
-  props: ['placeholder', 'type', 'modalValue'],
-
-  computed: {
-    dataInput: {
-      get() {
-        return this.modalValue;
-      },
-      set(value) {
-        this.$emit('update:modalValue', value);
-      },
-    },
-  },
 };
+</script>
+
+<script setup>
+const props = defineProps(['placeholder', 'type', 'modalValue']);
+defineEmits(['update:modalValue']);
+
+const dataInput = computed({
+  get() {
+    return props.modalValue;
+  },
+  set(value) {
+    this.$emit('update:modalValue', value);
+  },
+});
 </script>

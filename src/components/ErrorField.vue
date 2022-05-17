@@ -3,9 +3,13 @@
 </template>
 
 <script>
+import { defineProps } from 'vue';
+
 export default {
   name: 'ErrorField',
-
-  props: ['error'],
 };
+</script>
+
+<script setup>
+defineProps(['error']);
 </script>

@@ -18,41 +18,31 @@
 </template>
 
 <script>
-import { shallowRef } from 'vue';
+import { ref, computed } from 'vue';
 import ProductDescription from '@/components/ProductDescription.vue';
 import ProductDeliveryInfo from '@/components/ProductDeliveryInfo.vue';
 
 export default {
   name: 'AboutProductsTabs',
-
-  data() {
-    return {
-      currentTab: 'description',
-
-      tabs: [
-        {
-          name: 'description',
-          title: 'Информация о товаре',
-          component: shallowRef(ProductDescription),
-        },
-        {
-          name: 'delivery',
-          title: 'Доставка и возврат',
-          component: shallowRef(ProductDeliveryInfo),
-        },
-      ],
-    };
-  },
-
-  computed: {
-    currentTabComponent() {
-      return this.tabs.find((tab) => tab.name === this.currentTab).component;
-    },
-  },
-
-  components: {
-    ProductDescription,
-    ProductDeliveryInfo,
-  },
 };
+</script>
+
+<script setup>
+const currentTab = ref('description');
+const tabs = [
+  {
+    name: 'description',
+    title: 'Информация о товаре',
+    component: ProductDescription,
+  },
+  {
+    name: 'delivery',
+    title: 'Доставка и возврат',
+    component: ProductDeliveryInfo,
+  },
+];
+
+const currentTabComponent = computed(
+  () => tabs.find((tab) => tab.name === currentTab.value).component,
+);
 </script>

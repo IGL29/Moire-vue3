@@ -21,7 +21,7 @@
     </p>
     <span class="product__code"> Артикул: {{ product.product.id }} </span>
 
-    <CounterInput v-model:number="quantityProducts"/>
+    <CounterInput v-model:modelValue="quantityProducts"/>
 
     <b class="product__price"> {{ product.price }} ₽ </b>
 
@@ -43,59 +43,49 @@
 </template>
 
 <script>
+import {
+  defineProps, ref, watch,
+} from 'vue';
+import { useStore } from 'vuex';
 import CounterInput from '@/components/CounterInput.vue';
 
 export default {
   name: 'CartItem',
+};
+</script>
 
-  props: ['product'],
+<script setup>
+const props = defineProps(['product']);
+const $store = useStore();
 
-  data() {
-    return {
-      quantityProducts: this.product.quantity,
-      loading: false,
-    };
-  },
-
-  methods: {
-    changeQuantity() {
-      this.$store.dispatch('changeQuantityProduct', {
-        basketItemId: this.product.id,
-        quantity: this.quantityProducts,
-      });
-    },
-
-    deleteProduct() {
-      this.loading = true;
-      this.$store.dispatch('deleteProduct', {
-        basketItemId: this.product.id,
-      })
-        .then(() => {
-          this.$store.commit('showNotifySuccess');
-        })
-        .catch(() => {
-          this.$store.commit('showNotifyError');
-        })
-        .finally(() => { this.loading = false; });
-    },
-
-    checkImage(product) {
-      if (product.color?.gallery?.[0]?.file.url) {
-        return product.color?.gallery?.[0]?.file.url;
-      }
-      return '../img/no_image.png';
-    },
-  },
-
-  components: {
-    CounterInput,
-  },
-
-  watch: {
-    quantityProducts() {
-      this.changeQuantity();
-    },
-  },
+const loading = ref(false);
+const deleteProduct = () => {
+  loading.value = true;
+  $store.dispatch('deleteProduct', {
+    basketItemId: props.product.id,
+  })
+    .then(() => {
+      $store.commit('showNotifySuccess');
+    })
+    .catch(() => {
+      $store.commit('showNotifyError');
+    })
+    .finally(() => { loading.value = false; });
 };
 
+const quantityProducts = ref(props.product.quantity);
+const changeQuantity = () => {
+  $store.dispatch('changeQuantityProduct', {
+    basketItemId: props.product.id,
+    quantity: quantityProducts.value,
+  });
+};
+watch(() => quantityProducts, () => changeQuantity());
+
+const checkImage = (product) => {
+  if (product.color?.gallery?.[0]?.file.url) {
+    return product.color?.gallery?.[0]?.file.url;
+  }
+  return '../img/no_image.png';
+};
 </script>

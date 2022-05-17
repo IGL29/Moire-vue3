@@ -31,7 +31,7 @@
         <div class="item__form">
           <form class="form" action="#" method="POST" @submit.prevent="doAddProductToCart">
             <div class="item__row item__row--center">
-              <CounterInput v-model:number="quantityProducts" />
+              <CounterInput v-model="quantityProducts" />
 
               <b class="item__price"> {{ product.price }} ₽ </b>
             </div>
@@ -106,6 +106,7 @@ import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import CounterInput from '@/components/CounterInput.vue';
 import LoaderElement from '@/components/LoaderElement.vue';
 import ErrorNotify from '@/components/ErrorNotify.vue';
+import useAddProductToCart from '@/composables/useAddProductToCart';
 
 export default {
   name: 'ProductPage',
@@ -133,6 +134,8 @@ const doLoadProduct = () => {
       errorResponse.value = true;
     });
 };
+
+const { postProductToCart, isLoading: isLoadingPostProductToCart } = useAddProductToCart();
 
 const quantityProducts = ref(1);
 const doAddProductToCart = () => {

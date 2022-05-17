@@ -144,25 +144,6 @@ const filterFieldsNotEmpty = computed(() => Object.values(filters.value).some((f
   return filter;
 }));
 
-// computed: {
-//   ...mapGetters([
-//     'filters',
-//     'materials',
-//     'seasons',
-//     'categories',
-//     'colors',
-//   ]),
-
-//   filterFieldsNotEmpty() {
-//     return Object.values(this.filters).some((filter) => {
-//       if (Array.isArray(filter)) {
-//         return filter.length;
-//       }
-//       return filter;
-//     });
-//   },
-// },
-
 const getMaterials = () => $store.dispatch('loadMaterialsData');
 const getSeasons = () => $store.dispatch('loadSeasonsData');
 const getCategories = () => $store.dispatch('loadCategoriesData');
@@ -173,21 +154,6 @@ const resetFilter = () => {
   $store.commit('resetFilter');
   filterProducts();
 };
-
-// methods: {
-//   ...mapActions({
-//     getMaterials: 'loadMaterialsData',
-//     getSeasons: 'loadSeasonsData',
-//     getCategories: 'loadCategoriesData',
-//     getColors: 'loadColorsData',
-//     filterProducts: 'loadProductsData',
-//   }),
-
-//   resetFilter() {
-//     this.$store.commit('resetFilter');
-//     this.filterProducts();
-//   },
-// },
 
 onMounted(() => {
   getMaterials();

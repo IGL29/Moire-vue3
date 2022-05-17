@@ -9,13 +9,14 @@
 </template>
 
 <script>
+import { useStore } from 'vuex';
+
 export default {
   name: 'ErrorNotify',
-
-  methods: {
-    repeatRequest() {
-      this.$store.dispatch('loadProductsData');
-    },
-  },
 };
+</script>
+
+<script setup>
+const $store = useStore();
+const repeatRequest = () => $store.dispatch('loadProductsData');
 </script>

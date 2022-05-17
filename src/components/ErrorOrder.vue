@@ -8,9 +8,13 @@
 </template>
 
 <script>
+import { defineProps } from 'vue';
+
 export default {
   name: 'ErrorOrder',
-
-  props: ['errorMessage'],
 };
+</script>
+
+<script setup>
+defineProps(['errorMessage']);
 </script>
