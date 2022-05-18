@@ -11,15 +11,15 @@ export default {
 </script>
 
 <script setup>
-const props = defineProps(['placeholder', 'type', 'modalValue']);
-defineEmits(['update:modalValue']);
+const props = defineProps(['placeholder', 'type', 'modelValue']);
+const emits = defineEmits(['update:modelValue']);
 
 const dataInput = computed({
   get() {
     return props.modalValue;
   },
   set(value) {
-    this.$emit('update:modalValue', value);
+    emits('update:modelValue', value);
   },
 });
 </script>

@@ -38,6 +38,10 @@ export default createStore({
       return state.productsData;
     },
 
+    product(state) {
+      return state.productData;
+    },
+
     numberPrevProducts(state) {
       return state.numberPrevProducts;
     },
@@ -317,7 +321,7 @@ export default createStore({
     addProductToCart(context, {
       productId, colorId, sizeId, quantity,
     }) {
-      axios
+      return axios
         .post(`${API_BASE_URL}/api/baskets/products`, {
           productId,
           colorId,
@@ -328,7 +332,9 @@ export default createStore({
             userAccessKey: context.state.accessKey,
           },
         })
-        .then(() => { context.dispatch('loadBasketData'); });
+        .then(() => {
+          context.dispatch('loadBasketData');
+        });
     },
 
     changeQuantityProduct(context, { basketItemId, quantity }) {

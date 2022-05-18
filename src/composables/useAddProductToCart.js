@@ -5,12 +5,12 @@ export default () => {
   const $store = useStore();
   const isLoading = ref(false);
 
-  async function postProductToCart({
+  function postProductToCart({
     productId, colorId, sizeId, quantity = 1,
   }) {
     isLoading.value = true;
 
-    $store.dispatch('addProductToCart', {
+    return $store.dispatch('addProductToCart', {
       productId,
       colorId,
       sizeId,
@@ -20,9 +20,10 @@ export default () => {
         isLoading.value = false;
         $store.commit('showNotifySuccess');
       })
-      .catch(() => {
+      .catch((err) => {
         isLoading.value = false;
         $store.commit('showNotifyError');
+        console.log(err.response.data.error.request);
       });
   }
 

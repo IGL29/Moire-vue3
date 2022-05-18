@@ -14,5 +14,5 @@ export default {
 </script>
 
 <script setup>
-defineProps('products');
+defineProps(['products']);
 </script>

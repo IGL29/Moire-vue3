@@ -14,7 +14,7 @@ const routes = [
     component: MainPage,
   },
   {
-    path: '/product/:slug',
+    path: '/product/:slug/:color',
     name: 'product',
     component: ProductPage,
   },

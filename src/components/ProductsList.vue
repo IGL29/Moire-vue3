@@ -1,7 +1,7 @@
 <template>
   <LoaderElement v-if="loading" />
 
-  <ErrorNotify v-else-if="error"/>
+  <ErrorNotify @do-repeat-request="emitFetchProducts" v-else-if="error"/>
 
   <ProductsNotFound v-else-if="!products.length" :message="messageNotFoundProducts" />
 
@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { defineProps } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 import ProductsItem from '@/components/ProductsItem.vue';
 import LoaderElement from '@/components/LoaderElement.vue';
 import ErrorNotify from '@/components/ErrorNotify.vue';
@@ -24,5 +24,8 @@ export default {
 
 <script setup>
 defineProps(['products', 'error', 'loading']);
+const emits = defineEmits(['doRepeatRequest']);
+
 const messageNotFoundProducts = 'Товары с выбранными параметрами фильтра не найдены';
+const emitFetchProducts = () => emits('doRepeatRequest');
 </script>

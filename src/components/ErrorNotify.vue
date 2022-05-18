@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { useStore } from 'vuex';
+import { defineEmits } from 'vue';
 
 export default {
   name: 'ErrorNotify',
@@ -17,6 +17,6 @@ export default {
 </script>
 
 <script setup>
-const $store = useStore();
-const repeatRequest = () => $store.dispatch('loadProductsData');
+const emits = defineEmits(['doRepeatRequest']);
+const repeatRequest = () => emits('doRepeatRequest');
 </script>

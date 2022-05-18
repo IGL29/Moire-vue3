@@ -10,7 +10,7 @@
           {{ countProducts }}
         </span>
 
-        <InputNumberItems :loading="loadingProducts" :error="errorRequest"/>
+        <InputNumberItems :loading="isLoading" :error="isError"/>
       </div>
     </div>
 
@@ -20,9 +20,10 @@
 
       <section class="catalog">
         <ProductsList
+          @do-repeat-request="fetchProducts"
           :products="products"
-          :error="errorRequest"
-          :loading="loadingProducts"
+          :error="isError"
+          :loading="isLoading"
         />
 
         <ProductsPagination />
@@ -71,6 +72,7 @@ import InputNumberItems from '@/components/InputNumberItems.vue';
 import FilterForm from '@/components/FilterForm.vue';
 import ProductsPagination from '@/components/ProductsPagination.vue';
 import ProductsList from '@/components/ProductsList.vue';
+import useLoadProducts from '@/composables/useLoadProducts';
 
 export default {
   name: 'MainPage',
@@ -79,6 +81,9 @@ export default {
 
 <script setup>
 const $store = useStore();
+
+const { isLoading, isError, fetchProducts } = useLoadProducts();
+fetchProducts();
 
 const products = computed(() => $store.getters.products);
 const numberProducts = computed(() => $store.getters.numberProducts);
@@ -93,22 +98,7 @@ defineAsyncComponent({
 
 const countProducts = computed(() => useDeclination(numberProducts, ['товар', 'товара', 'товаров']));
 
-const errorRequest = ref(false);
-const loadingProducts = ref(false);
-const getProducts = () => {
-  loadingProducts.value = true;
-  errorRequest.value = false;
-  $store.dispatch('loadProductsData')
-    .then(() => {
-      loadingProducts.value = false;
-    }).catch(() => {
-      loadingProducts.value = false;
-      errorRequest.value = true;
-    });
-};
-
 $store.commit('clearTimerNotify');
-getProducts();
 
 const isMounted = ref(false);
 onMounted(() => {

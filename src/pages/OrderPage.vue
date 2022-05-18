@@ -123,7 +123,11 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import {
+  ref, reactive, computed, watch,
+} from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import FormField from '@/components/FormField.vue';
 import CartProductsInfo from '@/components/CartProductsInfo.vue';
@@ -131,119 +135,91 @@ import ErrorOrder from '@/components/ErrorOrder.vue';
 
 export default {
   name: 'OrderPage',
-
-  data() {
-    return {
-      formData: {},
-      formErrors: {},
-      deliveryTypeId: '',
-      paymentTypeId: '',
-      errorMessage: '',
-    };
-  },
-
-  computed: {
-    ...mapGetters({
-      payments: 'payments',
-      products: 'productsInCart',
-      numberProducts: 'numberProductsInCart',
-      totalPriceCart: 'totalPriceCart',
-    }),
-
-    deliveries() {
-      return this.$store.getters.deliveries;
-    },
-
-    priceSelectedDelivery() {
-      let price = null;
-      if (this.deliveryTypeId) {
-        price = this.deliveries.find((delivery) => (
-          Number(delivery.id) === Number(this.deliveryTypeId)
-        )).price;
-      }
-      return price;
-    },
-
-    totalPrice() {
-      return Number(this.totalPriceCart) + Number(this.priceSelectedDelivery);
-    },
-  },
-
-  methods: {
-    loadDeliveries() {
-      this.$store.dispatch('loadDeliveries');
-    },
-
-    formatPriceDelivery(price) {
-      if (Number(price) === 0) {
-        return 'бесплатно';
-      }
-      return `${price} ₽`;
-    },
-
-    setDefaultDelivery() {
-      if (this.deliveries[0].id) {
-        this.deliveryTypeId = this.deliveries[0].id;
-      }
-    },
-
-    loadPayments() {
-      this.$store.dispatch('loadPayments', this.deliveryTypeId);
-    },
-
-    setDefaultPayments() {
-      if (this.payments[0].id) {
-        this.paymentTypeId = this.payments[0].id;
-      }
-    },
-
-    order() {
-      this.formErrors = {};
-      this.$store.dispatch('postOrder', {
-        ...this.formData,
-        deliveryTypeId: this.deliveryTypeId,
-        paymentTypeId: this.paymentTypeId,
-      })
-        .then((response) => {
-          this.$store.commit('resetCart');
-          this.$router.push({ name: 'order-info', params: { id: response.data.id } });
-        })
-        .catch((error) => {
-          if (error.response) {
-            this.errorMessage = error.response.data.error.message;
-            this.formErrors = error.response.data.error.request || {};
-          } else if (error.request) {
-            this.errorMessage = 'Сервер не отвечает. Обновите страницу или попробуйте позднее.';
-          } else {
-            this.errorMessage = 'Произошла ошибка при запросе на сервер.';
-          }
-        });
-    },
-  },
-
-  components: {
-    BreadCrumbs,
-    FormField,
-    CartProductsInfo,
-    ErrorOrder,
-  },
-
-  watch: {
-    deliveries() {
-      this.setDefaultDelivery();
-    },
-
-    deliveryTypeId() {
-      this.loadPayments();
-    },
-
-    payments() {
-      this.setDefaultPayments();
-    },
-  },
-
-  created() {
-    this.loadDeliveries();
-  },
 };
+</script>
+
+<script setup>
+const $store = useStore();
+const $router = useRouter();
+
+const products = computed(() => $store.getters.productsInCart);
+const numberProducts = computed(() => $store.getters.numberProductsInCart);
+
+const deliveryTypeId = ref('');
+
+const totalPriceCart = computed(() => $store.getters.totalPriceCart);
+const deliveries = computed(() => $store.getters.deliveries);
+const priceSelectedDelivery = computed(() => {
+  let price = null;
+  if (deliveryTypeId.value) {
+    price = deliveries.value.find((delivery) => (
+      Number(delivery.id) === Number(deliveryTypeId.value)
+    )).price;
+  }
+  return price;
+});
+const totalPrice = computed(
+  () => Number(totalPriceCart.value) + Number(priceSelectedDelivery.value),
+);
+
+const formatPriceDelivery = (price) => {
+  if (Number(price) === 0) {
+    return 'бесплатно';
+  }
+  return `${price} ₽`;
+};
+
+const setDefaultDelivery = () => {
+  if (deliveries.value[0].id) {
+    deliveryTypeId.value = deliveries.value[0].id;
+  }
+};
+watch(deliveries, () => setDefaultDelivery());
+
+const loadPayments = () => {
+  $store.dispatch('loadPayments', deliveryTypeId.value);
+};
+watch(deliveryTypeId, () => loadPayments());
+
+const errorMessage = ref('');
+const payments = computed(() => $store.getters.payments);
+const paymentTypeId = ref('');
+const setDefaultPayments = () => {
+  if (payments.value[0].id) {
+    paymentTypeId.value = payments.value[0].id;
+  }
+};
+watch(payments, () => setDefaultPayments());
+
+const formData = reactive({});
+let formErrors = reactive({});
+const order = () => {
+  formErrors = reactive({});
+  $store.dispatch('postOrder', {
+    ...formData,
+    deliveryTypeId: deliveryTypeId.value,
+    paymentTypeId: paymentTypeId.value,
+  })
+    .then((response) => {
+      $store.commit('resetCart');
+      $router.push({ name: 'order-info', params: { id: response.data.id } });
+    })
+    .catch((error) => {
+      if (error.response) {
+        errorMessage.value = error.response.data.error.message;
+        formErrors.value = error.response.data.error.request || {};
+      } else if (error.request) {
+        errorMessage.value = 'Сервер не отвечает. Обновите страницу или попробуйте позднее.';
+      } else {
+        errorMessage.value = 'Произошла ошибка при запросе на сервер.';
+      }
+    });
+};
+
+const loadDeliveries = () => {
+  $store.dispatch('loadDeliveries');
+};
+loadDeliveries();
+
+watch(formData, () => console.log(formData));
 </script>

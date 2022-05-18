@@ -59,44 +59,37 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useStore } from 'vuex';
 import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import CartProductsInfo from '@/components/CartProductsInfo.vue';
 
 export default {
   name: 'OrderInfoPage',
-
-  computed: {
-    ...mapGetters({
-      orderInfo: 'orderData',
-      products: 'orderProducts',
-      numberProducts: 'orderNumberProducts',
-      totalPrice: 'orderTotalPrice',
-      deliveryPrice: 'orderDeliveryPrice',
-    }),
-  },
-
-  methods: {
-    formatPriceDelivery(price) {
-      if (Number(price) === 0) {
-        return 'бесплатно';
-      }
-      return `${price} ₽`;
-    },
-
-    loadOrderInfo() {
-      const orderid = this.$route.params.id;
-      this.$store.dispatch('loadOrderInfo', orderid);
-    },
-  },
-
-  components: {
-    BreadCrumbs,
-    CartProductsInfo,
-  },
-
-  created() {
-    this.loadOrderInfo();
-  },
 };
+</script>
+
+<script setup>
+const $store = useStore();
+const $route = useRoute();
+
+const orderInfo = computed(() => $store.getters.orderData);
+const products = computed(() => $store.getters.orderProducts);
+const numberProducts = computed(() => $store.getters.orderNumberProducts);
+const totalPrice = computed(() => $store.getters.orderTotalPrice);
+const deliveryPrice = computed(() => $store.getters.orderDeliveryPrice);
+
+const formatPriceDelivery = (price) => {
+  if (Number(price) === 0) {
+    return 'бесплатно';
+  }
+  return `${price} ₽`;
+};
+
+const loadOrderInfo = () => {
+  const orderid = $route.params.id;
+  $store.dispatch('loadOrderInfo', orderid);
+};
+loadOrderInfo();
 </script>

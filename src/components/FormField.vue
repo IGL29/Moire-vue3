@@ -33,14 +33,14 @@ export default {
 <script setup>
 const props = defineProps(['formElement', 'label', 'placeholder', 'type', 'modalValue', 'errorText']);
 
-defineEmits(['update:modalValue']);
+const emits = defineEmits(['update:modalValue']);
 
 const dataInput = computed({
   get() {
     return props.modalValue;
   },
   set(value) {
-    return this.$emit('update:modalValue', value);
+    emits('update:modalValue', value);
   },
 });
 </script>

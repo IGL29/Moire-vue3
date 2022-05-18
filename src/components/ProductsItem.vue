@@ -17,17 +17,17 @@
 
     <router-link
       title="Перейти на страницу товара"
-      :to="{ name: 'product', params: { slug: product.slug } }"
+      :to="{ name: 'product', params: { slug: product.slug, color: currentColorId } }"
       class="catalog__pic"
     >
-      <!-- <img :src="currentImage()" :alt="product.title" /> -->
+      <img :ref="refImage" :src="srcImage" :alt="product.title" />
     </router-link>
 
     <div class="catalog__wrapper">
       <h3 class="catalog__title">
         <router-link
           title="Перейти на страницу товара"
-          :to="{ name: 'product', params: { slug: product.slug } }"
+          :to="{ name: 'product', params: { slug: product.slug, color: currentColorId } }"
         >
           {{ product.title }}
         </router-link>
@@ -36,7 +36,7 @@
       <span class="catalog__price"> {{ product.price }} ₽ </span>
 
       <ProductColors
-        v-model="selectedColorId"
+        v-model="currentColorId"
         :colors="product.colors"
         :productSlug="product.slug"
       />
@@ -45,11 +45,13 @@
 </template>
 
 <script>
-import { ref, computed, defineProps } from 'vue';
+import {
+  ref, computed, defineProps, watch,
+} from 'vue';
 import { useStore } from 'vuex';
 import ProductColors from '@/components/ProductColors.vue';
-import useAddProductToCart from '../composables/useAddProductToCart';
-// import useChangeImage from '@/composables/useChangeImage';
+import useChangeImage from '@/composables/useChangeImage';
+import useAddProductToCart from '@/composables/useAddProductToCart';
 
 export default {
   name: 'ProductsItem',
@@ -61,8 +63,6 @@ const $store = useStore();
 
 const props = defineProps(['product']);
 
-const isLoadingFetchProduct = ref(false);
-
 const firstColorOption = computed(() => props.product.colors[0].color.id);
 const productsInCart = computed(() => $store.getters.basketData);
 const selectedColorId = ref('');
@@ -70,12 +70,20 @@ const productStatus = computed(() => productsInCart.value.some((productInCart) =
   (productInCart.product.id === props.product.id
   && Number(productInCart.color.color.id) === Number(selectedColorId.value))
 )));
-const currentColor = () => {
-  if (!selectedColorId.value && firstColorOption.value) {
-    selectedColorId.value = firstColorOption.value;
-  }
-};
+const currentColorId = computed({
+  get() {
+    return selectedColorId.value || firstColorOption.value || '';
+  },
+  set(newValue) {
+    selectedColorId.value = newValue;
+  },
+});
 
+const refImage = ref(null);
+
+const { srcImage, doSetImage } = useChangeImage();
+
+const isLoadingFetchProduct = ref(false);
 const { postProductToCart, isLoading: isLoadingPostProductToCart } = useAddProductToCart();
 const addProductToCart = async () => {
   isLoadingFetchProduct.value = true;
@@ -91,5 +99,6 @@ const addProductToCart = async () => {
   });
 };
 
-currentColor();
+doSetImage(props.product, currentColorId.value);
+watch(currentColorId, () => doSetImage(props.product, currentColorId.value));
 </script>

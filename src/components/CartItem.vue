@@ -5,8 +5,7 @@
         :src="checkImage(product)"
         width="120"
         height="120"
-        srcset="img/product-square-4@2x.jpg 2x"
-        alt="Название товара"
+        :alt="product.product.title"
       />
     </div>
     <h3 class="product__title">

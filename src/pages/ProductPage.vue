@@ -1,7 +1,7 @@
 <template>
-  <LoaderElement v-if="loadingProduct" />
+  <LoaderElement v-if="isLoading" />
 
-  <ErrorNotify v-else-if="errorResponse" />
+  <ErrorNotify @do-repeat-request="fetchProduct" v-else-if="isError" />
 
   <main class="content container" v-else-if="product">
     <div class="content__top">
@@ -16,8 +16,7 @@
           <img
             width="570"
             height="570"
-            :src="pictureByColor"
-            srcset="img/product-square-1@2x.jpg 2x"
+            :src="srcImage"
             alt="Название товара"
           />
         </div>
@@ -29,7 +28,7 @@
           {{ title }}
         </h2>
         <div class="item__form">
-          <form class="form" action="#" method="POST" @submit.prevent="doAddProductToCart">
+          <form class="form" action="#" method="POST" @submit.prevent="doPostProductToCart">
             <div class="item__row item__row--center">
               <CounterInput v-model="quantityProducts" />
 
@@ -95,7 +94,7 @@
 
 <script>
 import {
-  ref, computed, watch, onBeforeMount,
+  ref, computed, watch,
 } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
@@ -107,6 +106,7 @@ import CounterInput from '@/components/CounterInput.vue';
 import LoaderElement from '@/components/LoaderElement.vue';
 import ErrorNotify from '@/components/ErrorNotify.vue';
 import useAddProductToCart from '@/composables/useAddProductToCart';
+import useLoadProduct from '@/composables/useLoadProduct';
 
 export default {
   name: 'ProductPage',
@@ -114,48 +114,24 @@ export default {
 </script>
 
 <script setup>
-const $route = useRoute();
 const $store = useStore();
+const $route = useRoute();
 
-const loadingProduct = ref(false);
-const errorResponse = ref(false);
-const doLoadProduct = () => {
-  loadingProduct.value = true;
-  errorResponse.value = false;
-  const { slug } = $route.params;
-  $store
-    .dispatch('loadProductData', { slug })
-    .then(() => {
-      loadingProduct.value = false;
-      errorResponse.value = false;
-    })
-    .catch(() => {
-      loadingProduct.value = false;
-      errorResponse.value = true;
-    });
-};
+const { fetchProduct, isLoading, isError } = useLoadProduct();
+fetchProduct();
 
-const { postProductToCart, isLoading: isLoadingPostProductToCart } = useAddProductToCart();
-
+const { postProductToCart } = useAddProductToCart();
+const product = computed(() => $store.getters.product);
 const quantityProducts = ref(1);
-const doAddProductToCart = () => {
-  $store.dispatch('addProductToCart', {
-    productId: product.value.id,
-    colorId: selectedColorId.value,
-    sizeId: selectedSizeId.value,
-    quantity: quantityProducts.value,
-  })
-    .then(() => {
-      $store.commit('showNotifySuccess');
-    })
-    .catch(() => {
-      $store.commit('showNotifyError');
-    });
-};
-
-const product = computed(() => $store.state.productData);
 const selectedColorId = ref('');
 const selectedSizeId = ref('');
+const doPostProductToCart = () => postProductToCart({
+  productId: product.value.id,
+  colorId: selectedColorId.value,
+  sizeId: selectedSizeId.value,
+  quantity: quantityProducts.value,
+});
+
 const doSetDefaultSize = () => {
   const defaultSize = product.value.sizes[0].id;
   if (defaultSize) {
@@ -163,13 +139,13 @@ const doSetDefaultSize = () => {
   }
 };
 const doSetDefaultColor = () => {
-  const defaultColor = product.value.colors[0].color.id;
+  const defaultColor = $route.params.color || product.value.colors[0].color.id;
   if (defaultColor) {
     selectedColorId.value = defaultColor;
   }
 };
 
-const pictureByColor = useChangeImage(product.value, selectedColorId);
+const { srcImage, doSetImage } = useChangeImage();
 
 const category = computed(() => {
   if (product.value?.category?.title) {
@@ -189,14 +165,12 @@ const successfulRequestNotify = computed(() => $store.getters.successfulRequestN
 const errorRequestNotify = computed(() => $store.getters.errorRequestNotify);
 
 $store.commit('clearTimerNotify');
-doLoadProduct();
 
-watch(() => product, () => {
+watch(product, () => {
   doSetDefaultColor();
   doSetDefaultSize();
 });
 
-onBeforeMount(() => {
-
-});
+doSetImage(product.value, selectedColorId.value);
+watch(selectedColorId, () => doSetImage(product.value, selectedColorId.value));
 </script>

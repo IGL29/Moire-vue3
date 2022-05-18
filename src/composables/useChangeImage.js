@@ -1,15 +1,20 @@
-export default function useChangeImage(product, selectedColorId) {
-  let pictureByColor = null;
+import { ref } from 'vue';
 
-  if (product) {
-    const colorItem = product?.colors.find((color) => (
-      Number(color.color.id) === Number(selectedColorId)
-    ));
-    if (colorItem?.gallery?.[0]?.file?.url) {
-      pictureByColor = colorItem.gallery[0].file.url;
+export default () => {
+  const srcImage = ref('');
+
+  const doSetImage = (product, selectedColorId) => {
+    if (product && selectedColorId !== undefined) {
+      const colorItem = product?.colors.find((color) => (
+        Number(color.color.id) === Number(selectedColorId)
+      ));
+      if (colorItem?.gallery?.[0]?.file?.url) {
+        srcImage.value = colorItem.gallery[0].file.url;
+      }
+    } else {
+      srcImage.value = 'img/no_image.png';
     }
-  } else {
-    pictureByColor = 'img/no_image.png';
-  }
-  return pictureByColor;
-}
+  };
+
+  return { srcImage, doSetImage };
+};
