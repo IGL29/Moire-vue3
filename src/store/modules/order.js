@@ -1,6 +1,5 @@
 /*  eslint no-shadow: ["error", { "allow": ["state"] }] */
-import axios from 'axios';
-import API_BASE_URL from '@/config';
+import api from '../../api';
 
 const state = () => ({
   orderData: null,
@@ -48,21 +47,16 @@ const actions = {
   postOrder(context, {
     name, address, phone, email, deliveryTypeId, paymentTypeId, comment,
   }) {
-    return axios
-      .post(`${API_BASE_URL}/api/orders`, {
-        name,
-        address,
-        phone,
-        email,
-        deliveryTypeId,
-        paymentTypeId,
-        comment,
-      },
-      {
-        params: {
-          userAccessKey: context.rootState.accessKey,
-        },
-      })
+    return api.postOrder({
+      userAccessKey: context.rootState.accessKey,
+      name,
+      address,
+      phone,
+      email,
+      deliveryTypeId,
+      paymentTypeId,
+      comment,
+    })
       .then((response) => {
         context.commit('saveOrderData', response.data);
         return response;
@@ -70,12 +64,7 @@ const actions = {
   },
 
   loadOrderInfo(context, id) {
-    axios
-      .get(`${API_BASE_URL}/api/orders/${id}`, {
-        params: {
-          userAccessKey: context.rootState.accessKey,
-        },
-      })
+    return api.loadOrderInfo({ userAccessKey: context.rootState.accessKey, id })
       .then((response) => { context.commit('saveOrderData', response.data); });
   },
 };

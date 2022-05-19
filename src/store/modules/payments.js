@@ -1,6 +1,5 @@
 /*  eslint no-shadow: ["error", { "allow": ["state"] }] */
-import axios from 'axios';
-import API_BASE_URL from '@/config';
+import api from '@/api';
 
 const state = () => ({
   payments: [],
@@ -20,12 +19,7 @@ const mutations = {
 
 const actions = {
   loadPayments(context, deliveryTypeId) {
-    axios
-      .get(`${API_BASE_URL}/api/payments`, {
-        params: {
-          deliveryTypeId,
-        },
-      })
+    return api.loadPayments({ deliveryTypeId })
       .then((response) => context.commit('savePayments', response.data));
   },
 };

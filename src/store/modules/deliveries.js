@@ -1,6 +1,5 @@
 /*  eslint no-shadow: ["error", { "allow": ["state"] }] */
-import axios from 'axios';
-import API_BASE_URL from '@/config';
+import api from '@/api';
 
 const state = () => ({
   deliveries: [],
@@ -20,8 +19,7 @@ const mutations = {
 
 const actions = {
   loadDeliveries(context) {
-    axios
-      .get(`${API_BASE_URL}/api/deliveries`)
+    return api.loadDeliveries()
       .then((response) => {
         context.commit('saveDeliveries', response.data);
       });

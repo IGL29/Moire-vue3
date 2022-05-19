@@ -1,6 +1,5 @@
 /*  eslint no-shadow: ["error", { "allow": ["state"] }] */
-import axios from 'axios';
-import API_BASE_URL from '@/config';
+import api from '@/api';
 
 const state = () => ({
   basketData: [],
@@ -29,12 +28,7 @@ const mutations = {
 
 const actions = {
   loadBasketData(context) {
-    return axios
-      .get(`${API_BASE_URL}/api/baskets`, {
-        params: {
-          userAccessKey: context.rootState.accessKey,
-        },
-      })
+    return api.loadBasketData({ userAccessKey: context.rootState.accessKey })
       .then((response) => {
         context.commit('getProductsFromCart', response.data);
       });
@@ -42,43 +36,25 @@ const actions = {
   addProductToCart(context, {
     productId, colorId, sizeId, quantity,
   }) {
-    return axios
-      .post(`${API_BASE_URL}/api/baskets/products`, {
-        productId,
-        colorId,
-        sizeId,
-        quantity,
-      }, {
-        params: {
-          userAccessKey: context.rootState.accessKey,
-        },
-      })
+    return api.addProductToCart({
+      userAccessKey: context.rootState.accessKey,
+      productId,
+      colorId,
+      sizeId,
+      quantity,
+    })
       .then(() => {
         context.dispatch('loadBasketData');
       });
   },
   changeQuantityProduct(context, { basketItemId, quantity }) {
-    return axios
-      .put(`${API_BASE_URL}/api/baskets/products`, {
-        basketItemId,
-        quantity,
-      }, {
-        params: {
-          userAccessKey: context.rootState.accessKey,
-        },
-      })
+    return api.changeQuantityProduct({
+      userAccessKey: context.rootState.accessKey, basketItemId, quantity,
+    })
       .then(() => { context.dispatch('loadBasketData'); });
   },
   deleteProduct(context, { basketItemId }) {
-    return axios
-      .delete(`${API_BASE_URL}/api/baskets/products`, {
-        data: {
-          basketItemId,
-        },
-        params: {
-          userAccessKey: context.rootState.accessKey,
-        },
-      })
+    return api.deleteProduct({ userAccessKey: context.rootState.accessKey, basketItemId })
       .then(() => { context.dispatch('loadBasketData'); });
   },
 };

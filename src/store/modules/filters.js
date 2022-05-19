@@ -1,6 +1,5 @@
 /*  eslint no-shadow: ["error", { "allow": ["state"] }] */
-import axios from 'axios';
-import API_BASE_URL from '@/config';
+import api from '@/api';
 
 const state = () => ({
   materialsData: [],
@@ -63,32 +62,25 @@ const mutations = {
 
 const actions = {
   loadMaterialsData(context) {
-    axios
-      .get(`${API_BASE_URL}/api/materials`)
+    return api.loadMaterialsData()
       .then((response) => {
         context.commit('addMaterialsData', response.data.items);
       });
   },
-
   loadSeasonsData(context) {
-    axios
-      .get(`${API_BASE_URL}/api/seasons`)
+    return api.loadSeasonsData()
       .then((response) => {
         context.commit('addSeasonsData', response.data.items);
       });
   },
-
   loadCategoriesData(context) {
-    axios
-      .get(`${API_BASE_URL}/api/productCategories`)
+    return api.loadCategoriesData()
       .then((response) => {
         context.commit('addCategoriesData', response.data.items);
       });
   },
-
   loadColorsData(context) {
-    axios
-      .get(`${API_BASE_URL}/api/colors`)
+    return api.loadColorsData()
       .then((response) => {
         context.commit('addColors', response.data.items);
       });
