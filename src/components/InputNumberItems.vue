@@ -34,7 +34,7 @@ defineProps(['loading', 'error']);
 
 const prevNumbers = [12, 24, 32];
 
-const numberPrevProducts = computed(() => $store.getters.numberPrevProducts);
+const numberPrevProducts = computed(() => $store.getters['page/numberPrevProducts']);
 const numberItems = computed({
   get() {
     return numberPrevProducts.value;

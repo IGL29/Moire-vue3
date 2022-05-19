@@ -112,9 +112,7 @@
           :totalPrice="totalPrice"
           :deliveryPrice="formatPriceDelivery(priceSelectedDelivery)"
         >
-          <button class="cart__button button button--primery" type="submit">
-            Оформить заказ
-          </button>
+          <BaseButton text="Оформить заказ" />
         </CartProductsInfo>
 
         <ErrorOrder v-if="errorMessage" :errorMessage="errorMessage"/>
@@ -133,6 +131,7 @@ import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import FormField from '@/components/FormField.vue';
 import CartProductsInfo from '@/components/CartProductsInfo.vue';
 import ErrorOrder from '@/components/ErrorOrder.vue';
+import BaseButton from '@/components/BaseButton.vue';
 
 export default {
   name: 'OrderPage',

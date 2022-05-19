@@ -1,5 +1,7 @@
 <template>
-<div class="not-found-page" />
+<div class="wrap-not-found">
+  <div class="not-found-page" />
+</div>
 </template>
 
 <script>

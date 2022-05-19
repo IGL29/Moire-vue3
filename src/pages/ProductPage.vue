@@ -67,9 +67,7 @@
               </fieldset>
             </div>
 
-            <button class="item__button button button--primery" type="submit">
-              В корзину
-            </button>
+            <BaseButton class="item__button" text="В корзину" />
           </form>
         </div>
       </div>
@@ -105,6 +103,7 @@ import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import CounterInput from '@/components/CounterInput.vue';
 import LoaderElement from '@/components/LoaderElement.vue';
 import ErrorNotify from '@/components/ErrorNotify.vue';
+import BaseButton from '@/components/BaseButton.vue';
 import useAddProductToCart from '@/composables/useAddProductToCart';
 import useLoadProduct from '@/composables/useLoadProduct';
 

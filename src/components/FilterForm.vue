@@ -104,9 +104,8 @@
         </ul>
       </fieldset>
 
-      <button class="filter__submit button button--primery" type="submit">
-        Применить
-      </button>
+      <BaseButton class="filter__submit" text="Применить" />
+
       <button
         class="filter__reset button button--second"
         type="button"
@@ -122,6 +121,7 @@
 <script>
 import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import BaseButton from '@/components/BaseButton.vue';
 
 export default {
   name: 'FilterForm',

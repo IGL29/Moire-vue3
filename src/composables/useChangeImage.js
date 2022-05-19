@@ -10,6 +10,8 @@ export default () => {
       ));
       if (colorItem?.gallery?.[0]?.file?.url) {
         srcImage.value = colorItem.gallery[0].file.url;
+      } else {
+        srcImage.value = 'img/no_image.png';
       }
     } else {
       srcImage.value = 'img/no_image.png';
