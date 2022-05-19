@@ -14,7 +14,7 @@ export default () => {
 
     const { slug } = $route.params;
     $store
-      .dispatch('loadProductData', { slug })
+      .dispatch('products/loadProductData', { slug })
       .then(() => {
         isLoading.value = false;
         isError.value = false;

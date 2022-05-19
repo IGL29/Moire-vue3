@@ -10,7 +10,7 @@ export default () => {
   }) {
     isLoading.value = true;
 
-    return $store.dispatch('addProductToCart', {
+    return $store.dispatch('cart/addProductToCart', {
       productId,
       colorId,
       sizeId,
@@ -18,12 +18,11 @@ export default () => {
     })
       .then(() => {
         isLoading.value = false;
-        $store.commit('showNotifySuccess');
+        $store.commit('notify/showNotifySuccess');
       })
-      .catch((err) => {
+      .catch(() => {
         isLoading.value = false;
-        $store.commit('showNotifyError');
-        console.log(err.response.data.error.request);
+        $store.commit('notify/showNotifyError');
       });
   }
 

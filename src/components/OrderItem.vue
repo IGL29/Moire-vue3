@@ -1,13 +1,16 @@
 <template>
 <li class="cart__order">
-  <h3>{{ product.product.title }}</h3>
-  <b>{{ product.product.price }} ₽</b>
-  <span>Артикул: {{ product.product.id }}</span>
+  <div>
+    <h3>{{ product.product.title }}</h3>
+    <span>Артикул: {{ product.product.id }}</span>
+  </div>
+  <p class="reset-margin">X {{ countProduct }}</p>
+  <p><b>{{ product.product.price }} ₽</b></p>
 </li>
 </template>
 
 <script>
-import { defineProps } from 'vue';
+import { defineProps, computed } from 'vue';
 
 export default {
   name: 'OrderItem',
@@ -15,5 +18,6 @@ export default {
 </script>
 
 <script setup>
-defineProps(['product']);
+const props = defineProps(['product']);
+const countProduct = computed(() => props.product.quantity);
 </script>

@@ -22,7 +22,7 @@ export default {
       this.$store.dispatch('createUser');
     }
     this.$store.commit('saveAccessKey');
-    this.$store.dispatch('loadBasketData');
+    this.$store.dispatch('cart/loadBasketData');
   },
 };
 </script>

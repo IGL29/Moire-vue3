@@ -23,5 +23,5 @@ export default {
 
 <script setup>
 const $store = useStore();
-const numberProducts = computed(() => $store.getters.numberProductsInCart);
+const numberProducts = computed(() => $store.getters['cart/numberProductsInCart']);
 </script>

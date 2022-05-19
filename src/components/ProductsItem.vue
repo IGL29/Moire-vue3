@@ -64,15 +64,16 @@ const $store = useStore();
 const props = defineProps(['product']);
 
 const firstColorOption = computed(() => props.product.colors[0].color.id);
-const productsInCart = computed(() => $store.getters.basketData);
+const productsInCart = computed(() => $store.getters['cart/basketData']);
 const selectedColorId = ref('');
 const productStatus = computed(() => productsInCart.value.some((productInCart) => (
   (productInCart.product.id === props.product.id
   && Number(productInCart.color.color.id) === Number(selectedColorId.value))
 )));
+
 const currentColorId = computed({
   get() {
-    return selectedColorId.value || firstColorOption.value || '';
+    return selectedColorId.value || firstColorOption.value;
   },
   set(newValue) {
     selectedColorId.value = newValue;
@@ -87,13 +88,13 @@ const isLoadingFetchProduct = ref(false);
 const { postProductToCart, isLoading: isLoadingPostProductToCart } = useAddProductToCart();
 const addProductToCart = async () => {
   isLoadingFetchProduct.value = true;
-  const product = await $store.dispatch('loadProductData', { slug: props.product.slug });
+  const product = await $store.dispatch('products/loadProductData', { slug: props.product.slug });
   const selectedSizeId = product.sizes[0].id;
   isLoadingFetchProduct.value = false;
 
   postProductToCart({
     productId: props.product.id,
-    colorId: selectedColorId.value,
+    colorId: currentColorId.value,
     sizeId: selectedSizeId,
     quantity: 1,
   });

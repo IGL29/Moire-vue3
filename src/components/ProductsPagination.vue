@@ -50,29 +50,29 @@ export default {
 <script setup>
 const $store = useStore();
 
-const currentPage = computed(() => $store.getters.currentPage);
+const currentPage = computed(() => $store.getters['page/currentPage']);
 
 const addClassActivePage = (page) => page === currentPage.value;
 
 const goToPage = (page) => {
-  $store.commit('updateCurrentPage', page);
-  $store.dispatch('loadProductsData');
+  $store.commit('page/updateCurrentPage', page);
+  $store.dispatch('products/loadProductsData');
 };
 
-const numberPages = computed(() => $store.getters.numberPages);
+const numberPages = computed(() => $store.getters['page/numberPages']);
 const allowedGoToNextPage = computed(() => numberPages.value > currentPage.value);
 const goToNextPage = () => {
   if (allowedGoToNextPage.value) {
-    $store.commit('updateCurrentPage', currentPage.value + 1);
-    $store.dispatch('loadProductsData');
+    $store.commit('page/updateCurrentPage', currentPage.value + 1);
+    $store.dispatch('products/loadProductsData');
   }
 };
 
 const allowedGoToPrevPage = computed(() => currentPage.value > 1);
 const goToPrevPage = () => {
   if (allowedGoToPrevPage.value) {
-    $store.commit('updateCurrentPage', currentPage.value - 1);
-    $store.dispatch('loadProductsData');
+    $store.commit('page/updateCurrentPage', currentPage.value - 1);
+    $store.dispatch('products/loadProductsData');
   }
 };
 </script>

@@ -20,7 +20,7 @@
     </p>
     <span class="product__code"> Артикул: {{ product.product.id }} </span>
 
-    <CounterInput v-model:modelValue="quantityProducts"/>
+    <CounterInput v-model="quantityProducts"/>
 
     <b class="product__price"> {{ product.price }} ₽ </b>
 
@@ -60,26 +60,26 @@ const $store = useStore();
 const loading = ref(false);
 const deleteProduct = () => {
   loading.value = true;
-  $store.dispatch('deleteProduct', {
+  $store.dispatch('cart/deleteProduct', {
     basketItemId: props.product.id,
   })
     .then(() => {
-      $store.commit('showNotifySuccess');
+      $store.commit('notify/showNotifySuccess');
     })
     .catch(() => {
-      $store.commit('showNotifyError');
+      $store.commit('notify/showNotifyError');
     })
     .finally(() => { loading.value = false; });
 };
 
 const quantityProducts = ref(props.product.quantity);
 const changeQuantity = () => {
-  $store.dispatch('changeQuantityProduct', {
+  $store.dispatch('cart/changeQuantityProduct', {
     basketItemId: props.product.id,
     quantity: quantityProducts.value,
   });
 };
-watch(() => quantityProducts, () => changeQuantity());
+watch(quantityProducts, () => changeQuantity());
 
 const checkImage = (product) => {
   if (product.color?.gallery?.[0]?.file.url) {

@@ -17,7 +17,7 @@
     </div>
 
     <section class="cart">
-      <form class="cart__form form" action="#" method="POST" @submit.prevent="order">
+      <form class="cart__form form" action="#" method="POST" @submit.prevent="doPostOrder">
         <div class="cart__field">
           <div class="cart__data">
             <FormField
@@ -108,6 +108,7 @@
         <CartProductsInfo
           :products="products"
           :numberProducts="numberProducts"
+          :totalNumberProducts="totalNumberProducts"
           :totalPrice="totalPrice"
           :deliveryPrice="formatPriceDelivery(priceSelectedDelivery)"
         >
@@ -124,7 +125,7 @@
 
 <script>
 import {
-  ref, reactive, computed, watch,
+  ref, computed, watch,
 } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -142,13 +143,14 @@ export default {
 const $store = useStore();
 const $router = useRouter();
 
-const products = computed(() => $store.getters.productsInCart);
-const numberProducts = computed(() => $store.getters.numberProductsInCart);
+const products = computed(() => $store.getters['cart/productsInCart']);
+const numberProducts = computed(() => $store.getters['order/orderNumberProducts']);
+const totalNumberProducts = computed(() => $store.getters['order/totalOrderNumberProducts']);
 
 const deliveryTypeId = ref('');
 
-const totalPriceCart = computed(() => $store.getters.totalPriceCart);
-const deliveries = computed(() => $store.getters.deliveries);
+const totalPriceCart = computed(() => $store.getters['cart/totalPriceCart']);
+const deliveries = computed(() => $store.getters['deliveries/deliveries']);
 const priceSelectedDelivery = computed(() => {
   let price = null;
   if (deliveryTypeId.value) {
@@ -177,12 +179,12 @@ const setDefaultDelivery = () => {
 watch(deliveries, () => setDefaultDelivery());
 
 const loadPayments = () => {
-  $store.dispatch('loadPayments', deliveryTypeId.value);
+  $store.dispatch('payments/loadPayments', deliveryTypeId.value);
 };
 watch(deliveryTypeId, () => loadPayments());
 
 const errorMessage = ref('');
-const payments = computed(() => $store.getters.payments);
+const payments = computed(() => $store.getters['payments/payments']);
 const paymentTypeId = ref('');
 const setDefaultPayments = () => {
   if (payments.value[0].id) {
@@ -191,17 +193,17 @@ const setDefaultPayments = () => {
 };
 watch(payments, () => setDefaultPayments());
 
-const formData = reactive({});
-let formErrors = reactive({});
-const order = () => {
-  formErrors = reactive({});
-  $store.dispatch('postOrder', {
-    ...formData,
+const formData = ref({});
+const formErrors = ref({});
+const doPostOrder = () => {
+  formErrors.value = {};
+  $store.dispatch('order/postOrder', {
+    ...formData.value,
     deliveryTypeId: deliveryTypeId.value,
     paymentTypeId: paymentTypeId.value,
   })
     .then((response) => {
-      $store.commit('resetCart');
+      $store.commit('cart/resetCart');
       $router.push({ name: 'order-info', params: { id: response.data.id } });
     })
     .catch((error) => {
@@ -217,9 +219,7 @@ const order = () => {
 };
 
 const loadDeliveries = () => {
-  $store.dispatch('loadDeliveries');
+  $store.dispatch('deliveries/loadDeliveries');
 };
 loadDeliveries();
-
-watch(formData, () => console.log(formData));
 </script>

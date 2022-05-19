@@ -99,11 +99,11 @@ export default {
 const $store = useStore();
 const messageCartEmpty = 'Корзина пуста...';
 
-const productsCart = computed(() => $store.getters.basketData);
-const totalPrice = computed(() => $store.getters.totalPriceCart);
-const numberProducts = computed(() => $store.getters.numberProductsInCart);
-const successfulRequestNotify = computed(() => $store.getters.successfulRequestNotify);
-const errorRequestNotify = computed(() => $store.getters.errorRequestNotify);
+const productsCart = computed(() => $store.getters['cart/basketData']);
+const totalPrice = computed(() => $store.getters['cart/totalPriceCart']);
+const numberProducts = computed(() => $store.getters['cart/numberProductsInCart']);
+const successfulRequestNotify = computed(() => $store.getters['notify/successfulRequestNotify']);
+const errorRequestNotify = computed(() => $store.getters['notify/errorRequestNotify']);
 
 const countProducts = computed(() => useDeclination(numberProducts, ['товар', 'товара', 'товаров']));
 
@@ -112,7 +112,7 @@ const errorRequest = ref(false);
 const getProducts = () => {
   loadingCart.value = true;
   errorRequest.value = false;
-  $store.dispatch('loadBasketData')
+  $store.dispatch('cart/loadBasketData')
     .then(() => {
       loadingCart.value = false;
     })
@@ -122,6 +122,6 @@ const getProducts = () => {
     });
 };
 
-$store.commit('clearTimerNotify');
+$store.commit('notify/clearTimerNotify');
 getProducts();
 </script>

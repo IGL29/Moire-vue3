@@ -16,7 +16,7 @@ const emits = defineEmits(['update:modelValue']);
 
 const dataInput = computed({
   get() {
-    return props.modalValue;
+    return props.modelValue;
   },
   set(value) {
     emits('update:modelValue', value);

@@ -121,7 +121,7 @@ const { fetchProduct, isLoading, isError } = useLoadProduct();
 fetchProduct();
 
 const { postProductToCart } = useAddProductToCart();
-const product = computed(() => $store.getters.product);
+const product = computed(() => $store.getters['products/product']);
 const quantityProducts = ref(1);
 const selectedColorId = ref('');
 const selectedSizeId = ref('');
@@ -161,10 +161,10 @@ const title = computed(() => {
   return 'Название товара';
 });
 
-const successfulRequestNotify = computed(() => $store.getters.successfulRequestNotify);
-const errorRequestNotify = computed(() => $store.getters.errorRequestNotify);
+const successfulRequestNotify = computed(() => $store.getters['notify/successfulRequestNotify']);
+const errorRequestNotify = computed(() => $store.getters['notify/errorRequestNotify']);
 
-$store.commit('clearTimerNotify');
+$store.commit('notify/clearTimerNotify');
 
 watch(product, () => {
   doSetDefaultColor();

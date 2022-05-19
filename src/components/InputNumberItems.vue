@@ -42,8 +42,8 @@ const numberItems = computed({
   set(value) {
     emits('update:error', false);
     emits('update:loading', true);
-    $store.commit('updateNumberPrevProducts', value);
-    $store.dispatch('loadProductsData')
+    $store.commit('page/updateNumberPrevProducts', value);
+    $store.dispatch('products/loadProductsData')
       .catch(() => { emits('update:error', true); })
       .finally(() => { emits('update:loading', false); });
   },

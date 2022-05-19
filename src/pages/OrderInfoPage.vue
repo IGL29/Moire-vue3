@@ -50,6 +50,7 @@
         <CartProductsInfo
           :products="products"
           :numberProducts="numberProducts"
+          :totalNumberProducts="totalNumberProducts"
           :totalPrice="totalPrice"
           :deliveryPrice="formatPriceDelivery(deliveryPrice)"
         />
@@ -74,11 +75,12 @@ export default {
 const $store = useStore();
 const $route = useRoute();
 
-const orderInfo = computed(() => $store.getters.orderData);
-const products = computed(() => $store.getters.orderProducts);
-const numberProducts = computed(() => $store.getters.orderNumberProducts);
-const totalPrice = computed(() => $store.getters.orderTotalPrice);
-const deliveryPrice = computed(() => $store.getters.orderDeliveryPrice);
+const orderInfo = computed(() => $store.getters['order/orderData']);
+const products = computed(() => $store.getters['order/orderProducts']);
+const numberProducts = computed(() => $store.getters['order/orderNumberProducts']);
+const totalNumberProducts = computed(() => $store.getters['order/totalOrderNumberProducts']);
+const totalPrice = computed(() => $store.getters['order/orderTotalPrice']);
+const deliveryPrice = computed(() => $store.getters['order/orderDeliveryPrice']);
 
 const formatPriceDelivery = (price) => {
   if (Number(price) === 0) {
@@ -89,7 +91,7 @@ const formatPriceDelivery = (price) => {
 
 const loadOrderInfo = () => {
   const orderid = $route.params.id;
-  $store.dispatch('loadOrderInfo', orderid);
+  $store.dispatch('order/loadOrderInfo', orderid);
 };
 loadOrderInfo();
 </script>

@@ -131,11 +131,11 @@ export default {
 <script setup>
 const $store = useStore();
 
-const filters = computed(() => $store.getters.filters);
-const materials = computed(() => $store.getters.materials);
-const seasons = computed(() => $store.getters.seasons);
-const categories = computed(() => $store.getters.categories);
-const colors = computed(() => $store.getters.colors);
+const filters = computed(() => $store.getters['filters/filters']);
+const materials = computed(() => $store.getters['filters/materials']);
+const seasons = computed(() => $store.getters['filters/seasons']);
+const categories = computed(() => $store.getters['filters/categories']);
+const colors = computed(() => $store.getters['filters/colors']);
 
 const filterFieldsNotEmpty = computed(() => Object.values(filters.value).some((filter) => {
   if (Array.isArray(filter)) {
@@ -144,14 +144,14 @@ const filterFieldsNotEmpty = computed(() => Object.values(filters.value).some((f
   return filter;
 }));
 
-const getMaterials = () => $store.dispatch('loadMaterialsData');
-const getSeasons = () => $store.dispatch('loadSeasonsData');
-const getCategories = () => $store.dispatch('loadCategoriesData');
-const getColors = () => $store.dispatch('loadColorsData');
-const filterProducts = () => $store.dispatch('loadProductsData');
+const getMaterials = () => $store.dispatch('filters/loadMaterialsData');
+const getSeasons = () => $store.dispatch('filters/loadSeasonsData');
+const getCategories = () => $store.dispatch('filters/loadCategoriesData');
+const getColors = () => $store.dispatch('filters/loadColorsData');
+const filterProducts = () => $store.dispatch('products/loadProductsData');
 
 const resetFilter = () => {
-  $store.commit('resetFilter');
+  $store.commit('filters/resetFilter');
   filterProducts();
 };
 

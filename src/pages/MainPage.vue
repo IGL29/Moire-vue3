@@ -85,10 +85,10 @@ const $store = useStore();
 const { isLoading, isError, fetchProducts } = useLoadProducts();
 fetchProducts();
 
-const products = computed(() => $store.getters.products);
-const numberProducts = computed(() => $store.getters.numberProducts);
-const successfulRequestNotify = computed(() => $store.getters.successfulRequestNotify);
-const errorRequestNotify = computed(() => $store.getters.errorRequestNotify);
+const products = computed(() => $store.getters['products/products']);
+const numberProducts = computed(() => $store.getters['page/numberProducts']);
+const successfulRequestNotify = computed(() => $store.getters['notify/successfulRequestNotify']);
+const errorRequestNotify = computed(() => $store.getters['notify/errorRequestNotify']);
 
 defineAsyncComponent({
   loader: () => import('@/components/NotifyMessage.vue'),
@@ -98,7 +98,7 @@ defineAsyncComponent({
 
 const countProducts = computed(() => useDeclination(numberProducts, ['товар', 'товара', 'товаров']));
 
-$store.commit('clearTimerNotify');
+$store.commit('notify/clearTimerNotify');
 
 const isMounted = ref(false);
 onMounted(() => {
