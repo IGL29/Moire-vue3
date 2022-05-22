@@ -1,7 +1,11 @@
 <template>
   <div class="wrapper">
     <TheHeader />
-    <router-view :key="$route.fullPath"/>
+      <router-view v-slot="{ Component }" :key="$route.fullPath">
+        <transition name="page" mode="out-in">
+          <component :is="Component"></component>
+        </transition>
+      </router-view>
     <TheFooter />
   </div>
 </template>
@@ -28,5 +32,12 @@ export default {
 </script>
 
 <style>
-
+.page-leave-active,
+.page-enter-active {
+  transition: all 0.5s ease-out;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
 </style>

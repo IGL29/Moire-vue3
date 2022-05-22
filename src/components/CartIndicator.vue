@@ -5,7 +5,7 @@
     aria-label="Корзина с товарами"
     :to="{ name: 'cart' }"
   >
-    <svg width="19" height="24">
+    <svg ref="refCart" width="19" height="24">
       <use xlink:href="#icon-cart"></use>
     </svg>
     <span class="header__count" aria-label="Количество товаров">{{ numberProducts }}</span>
@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
 export default {
@@ -23,5 +23,10 @@ export default {
 
 <script setup>
 const $store = useStore();
+const refCart = ref(null);
 const numberProducts = computed(() => $store.getters['cart/numberProductsInCart']);
+
+onMounted(() => {
+  $store.commit('setCartElementPosition', refCart.value.getBoundingClientRect());
+});
 </script>

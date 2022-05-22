@@ -25,6 +25,13 @@ export default createStore({
   },
   state: {
     accessKey: null,
+    cartElementPosition: {},
+  },
+
+  getters: {
+    getCartElementPosition(state) {
+      return state.cartElementPosition;
+    },
   },
 
   mutations: {
@@ -33,6 +40,9 @@ export default createStore({
         localStorage.setItem('user', response.accessKey);
       }
       state.accessKey = localStorage.getItem('user');
+    },
+    setCartElementPosition(state, position) {
+      state.cartElementPosition = position;
     },
   },
 

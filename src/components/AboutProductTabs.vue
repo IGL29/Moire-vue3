@@ -12,7 +12,9 @@
     </li>
   </ul>
   <div class="item__content">
-    <component :is="currentTabComponent"></component>
+    <Transition name="fade" mode="out-in">
+      <component :is="currentTabComponent" />
+    </Transition>
   </div>
 </div>
 </template>
@@ -46,3 +48,15 @@ const currentTabComponent = computed(
   () => tabs.find((tab) => tab.name === currentTab.value).component,
 );
 </script>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

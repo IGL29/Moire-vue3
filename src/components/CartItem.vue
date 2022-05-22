@@ -1,7 +1,16 @@
 <template>
   <li class="cart__item product">
-    <div class="product__pic">
+    <div
+      class="product__pic"
+      :class="{
+        loadImage: !isLoad && !isLoadError,
+        loadImageNext: !isLoad && !isLoadError && isNextLoad,
+        errorLoadImage: isLoadError
+      }"
+      >
       <img
+        @load="doSetLoaded"
+        @error="doSetLoadError"
         :src="checkImage(product)"
         width="120"
         height="120"
@@ -30,7 +39,7 @@
       aria-label="Удалить товар из корзины"
       @click.prevent="deleteProduct"
     >
-      <svg width="20" height="20" v-if="loading">
+      <svg width="20" height="20" v-if="isLoading">
         <use xlink:href="#icon-loading"></use>
       </svg>
 
@@ -38,6 +47,8 @@
         <use xlink:href="#icon-close"></use>
       </svg>
     </button>
+
+    <p class="error-message error-message--animation" v-if="isRepeatClickDelete">Уже удаляем...</p>
   </li>
 </template>
 
@@ -47,6 +58,7 @@ import {
 } from 'vue';
 import { useStore } from 'vuex';
 import CounterInput from '@/components/CounterInput.vue';
+import useStatusLoading from '@/composables/useStatusLoading';
 
 export default {
   name: 'CartItem',
@@ -57,9 +69,14 @@ export default {
 const props = defineProps(['product']);
 const $store = useStore();
 
-const loading = ref(false);
+const isLoading = ref(false);
+const isRepeatClickDelete = ref(false);
 const deleteProduct = () => {
-  loading.value = true;
+  if (isLoading.value) {
+    isRepeatClickDelete.value = true;
+    return;
+  }
+  isLoading.value = true;
   $store.dispatch('cart/deleteProduct', {
     basketItemId: props.product.id,
   })
@@ -69,7 +86,10 @@ const deleteProduct = () => {
     .catch(() => {
       $store.commit('notify/showNotifyError');
     })
-    .finally(() => { loading.value = false; });
+    .finally(() => {
+      isRepeatClickDelete.value = false;
+      isLoading.value = false;
+    });
 };
 
 const quantityProducts = ref(props.product.quantity);
@@ -87,4 +107,9 @@ const checkImage = (product) => {
   }
   return '../img/no_image.png';
 };
+
+const {
+  isLoad, isNextLoad, isLoadError, doSetLoaded, doSetLoadError, doSetStartLoading,
+} = useStatusLoading();
+doSetStartLoading();
 </script>

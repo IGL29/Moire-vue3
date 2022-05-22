@@ -76,13 +76,13 @@
 
       <router-link :to="{ name: 'cart' }" title="Перейти в корзину">
         <NotifyMessage
-          v-if="successfulRequestNotify"
+          :isVisible="successfulRequestNotify"
           text="Товар добавлен в корзину"
         />
       </router-link>
 
       <NotifyMessage
-        v-if="errorRequestNotify"
+        :isVisible="errorRequestNotify"
         text="Произошла ошибка при добавлении товара"
       />
 

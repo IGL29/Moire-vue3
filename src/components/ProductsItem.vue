@@ -1,5 +1,5 @@
 <template>
-  <li class="catalog__item">
+  <li ref="refWrapperItem" class="catalog__item">
     <button
       class="catalog__btn-add"
       :class="{ 'added-to-cart': productStatus }"
@@ -19,8 +19,19 @@
       title="Перейти на страницу товара"
       :to="{ name: 'product', params: { slug: product.slug, color: currentColorId } }"
       class="catalog__pic"
+      :class="{
+        loadImage: !isLoad && !isLoadError,
+        loadImageNext: !isLoad && !isLoadError && isNextLoad,
+        errorLoadImage: isLoadError
+      }"
     >
-      <img :ref="refImage" :src="srcImage" :alt="product.title" />
+      <img
+        @load="doSetLoaded"
+        @error="doSetLoadError"
+        ref="refImage"
+        :src="srcImage"
+        :alt="product.title"
+      />
     </router-link>
 
     <div class="catalog__wrapper">
@@ -37,7 +48,7 @@
 
       <ProductColors
         v-model="currentColorId"
-        :colors="product.colors"
+        :colors="product?.colors"
         :productSlug="product.slug"
       />
     </div>
@@ -52,6 +63,7 @@ import { useStore } from 'vuex';
 import ProductColors from '@/components/ProductColors.vue';
 import useChangeImage from '@/composables/useChangeImage';
 import useAddProductToCart from '@/composables/useAddProductToCart';
+import useStatusLoading from '@/composables/useStatusLoading';
 
 export default {
   name: 'ProductsItem',
@@ -61,7 +73,7 @@ export default {
 <script setup>
 const $store = useStore();
 
-const props = defineProps(['product']);
+const props = defineProps(['product', 'cartPosition']);
 
 const firstColorOption = computed(() => props.product.colors[0].color.id);
 const productsInCart = computed(() => $store.getters['cart/basketData']);
@@ -80,9 +92,12 @@ const currentColorId = computed({
   },
 });
 
-const refImage = ref(null);
+const refWrapperItem = ref(null);
 
 const { srcImage, doSetImage } = useChangeImage();
+const {
+  isLoad, isNextLoad, isLoadError, doSetLoaded, doSetLoadError, doSetStartLoading,
+} = useStatusLoading();
 
 const isLoadingFetchProduct = ref(false);
 const { postProductToCart, isLoading: isLoadingPostProductToCart } = useAddProductToCart();
@@ -97,9 +112,54 @@ const addProductToCart = async () => {
     colorId: currentColorId.value,
     sizeId: selectedSizeId,
     quantity: 1,
-  });
+  })
+    .then(() => {});
 };
 
 doSetImage(props.product, currentColorId.value);
 watch(currentColorId, () => doSetImage(props.product, currentColorId.value));
+watch(srcImage, () => doSetStartLoading());
 </script>
+
+<style>
+.loadImage {
+  position: relative;
+}
+
+.loadImage:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(253, 235, 250);
+}
+
+.loadImageNext:after {
+  background-color: rgba(253, 235, 250, 0.547);
+}
+
+.loadImage:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 7%;
+  background-color: rgba(240, 203, 217, 0.7);
+  z-index: 1;
+  transition: transform, top;
+  animation: loadImage 2s infinite alternate linear;
+}
+
+@keyframes loadImage {
+  0% {
+    top: 0;
+  }
+  100% {
+    top: 100%;
+    transform: translateY(-100%);
+  }
+}
+</style>
