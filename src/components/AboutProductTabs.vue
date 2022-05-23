@@ -13,14 +13,16 @@
   </ul>
   <div class="item__content">
     <Transition name="fade" mode="out-in">
-      <component :is="currentTabComponent" v-bind="getCurrentProps" />
+      <component :is="currentTabComponent" />
     </Transition>
   </div>
 </div>
 </template>
 
 <script>
-import { ref, computed, defineAsyncComponent } from 'vue';
+import {
+  ref, computed, defineAsyncComponent, h,
+} from 'vue';
 import LoaderElement from '@/components/LoaderElement.vue';
 import ErrorNotify from '@/components/ErrorNotify.vue';
 
@@ -45,7 +47,9 @@ const tabs = [
       loader: () => import('@/components/ProductDeliveryInfo.vue'),
       loadingComponent: LoaderElement,
       delay: 0,
-      errorComponent: ErrorNotify,
+      errorComponent: () => h(ErrorNotify, {
+        isShowButton: false,
+      }),
       onError(err, retry, fail, attempts) {
         if (attempts <= 3) {
           retry();
@@ -61,14 +65,6 @@ const tabs = [
 const currentTabComponent = computed(
   () => tabs.find((tab) => tab.name === currentTab.value).component,
 );
-const getCurrentProps = computed(() => {
-  if (isError.value) {
-    return {
-      isShowButton: false,
-    };
-  }
-  return null;
-});
 </script>
 
 <style>
