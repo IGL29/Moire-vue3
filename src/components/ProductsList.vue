@@ -19,13 +19,14 @@
 
 <script>
 import {
-  defineProps, defineEmits, ref, computed, onMounted,
+  defineProps, defineEmits, computed,
 } from 'vue';
 import { useStore } from 'vuex';
 import ProductsItem from '@/components/ProductsItem.vue';
 import LoaderElement from '@/components/LoaderElement.vue';
 import ErrorNotify from '@/components/ErrorNotify.vue';
 import ProductsNotFound from '@/components/ProductsNotFound.vue';
+import useMounted from '@/composables/useMounted';
 
 export default {
   name: 'ProductsList',
@@ -41,10 +42,7 @@ const messageNotFoundProducts = 'Товары с выбранными парам
 const emitFetchProducts = () => emits('doRepeatRequest');
 const cartPosition = computed(() => $store.getters.getCartElementPosition);
 
-const isMounted = ref(false);
-onMounted(() => {
-  isMounted.value = true;
-});
+const { isMounted } = useMounted();
 </script>
 
 <style>

@@ -46,9 +46,7 @@
 </template>
 
 <script>
-import {
-  ref, computed, onMounted, nextTick,
-} from 'vue';
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 import NotifyMessage from '@/components/NotifyMessage.vue';
 import InputNumberItems from '@/components/InputNumberItems.vue';
@@ -57,6 +55,7 @@ import ProductsPagination from '@/components/ProductsPagination.vue';
 import ProductsList from '@/components/ProductsList.vue';
 import useDeclination from '@/composables/useDeclination';
 import useLoadProducts from '@/composables/useLoadProducts';
+import useMounted from '@/composables/useMounted';
 
 export default {
   name: 'MainPage',
@@ -78,10 +77,5 @@ const countProducts = computed(() => useDeclination(numberProducts, ['товар
 
 $store.commit('notify/clearTimerNotify');
 
-const isMounted = ref(false);
-onMounted(() => {
-  nextTick(() => {
-    isMounted.value = true;
-  });
-});
+const { isMounted } = useMounted();
 </script>
