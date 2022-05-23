@@ -12,12 +12,20 @@
 
     <section class="item">
       <div class="item__pics pics">
-        <div class="pics__wrapper">
+        <div
+          class="pics__wrapper"
+          :class="{
+            loadImage: !isLoad && !isLoadError,
+            loadImageNext: !isLoad && !isLoadError && isNextLoad,
+            errorLoadImage: isLoadError
+          }">
           <img
             width="570"
             height="570"
             :src="srcImage"
             alt="Название товара"
+            @load="doSetLoaded"
+            @error="doSetLoadError"
           />
         </div>
       </div>
@@ -106,6 +114,7 @@ import ErrorNotify from '@/components/ErrorNotify.vue';
 import BaseButton from '@/components/BaseButton.vue';
 import useAddProductToCart from '@/composables/useAddProductToCart';
 import useLoadProduct from '@/composables/useLoadProduct';
+import useStatusLoading from '@/composables/useStatusLoading';
 
 export default {
   name: 'ProductPage',
@@ -159,6 +168,11 @@ const title = computed(() => {
   }
   return 'Название товара';
 });
+
+const {
+  isLoad, isNextLoad, isLoadError, doSetLoaded, doSetLoadError, doSetStartLoading,
+} = useStatusLoading();
+doSetStartLoading();
 
 const successfulRequestNotify = computed(() => $store.getters['notify/successfulRequestNotify']);
 const errorRequestNotify = computed(() => $store.getters['notify/errorRequestNotify']);

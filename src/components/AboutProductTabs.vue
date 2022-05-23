@@ -13,16 +13,16 @@
   </ul>
   <div class="item__content">
     <Transition name="fade" mode="out-in">
-      <component :is="currentTabComponent" />
+      <component :is="currentTabComponent" v-bind="getCurrentProps" />
     </Transition>
   </div>
 </div>
 </template>
 
 <script>
-import { ref, computed } from 'vue';
-import ProductDescription from '@/components/ProductDescription.vue';
-import ProductDeliveryInfo from '@/components/ProductDeliveryInfo.vue';
+import { ref, computed, defineAsyncComponent } from 'vue';
+import LoaderElement from '@/components/LoaderElement.vue';
+import ErrorNotify from '@/components/ErrorNotify.vue';
 
 export default {
   name: 'AboutProductsTabs',
@@ -31,22 +31,44 @@ export default {
 
 <script setup>
 const currentTab = ref('description');
+const isError = ref(false);
 const tabs = [
   {
     name: 'description',
     title: 'Информация о товаре',
-    component: ProductDescription,
+    component: defineAsyncComponent(() => import('@/components/ProductDescription.vue')),
   },
   {
     name: 'delivery',
     title: 'Доставка и возврат',
-    component: ProductDeliveryInfo,
+    component: defineAsyncComponent({
+      loader: () => import('@/components/ProductDeliveryInfo.vue'),
+      loadingComponent: LoaderElement,
+      delay: 0,
+      errorComponent: ErrorNotify,
+      onError(err, retry, fail, attempts) {
+        if (attempts <= 3) {
+          retry();
+        } else {
+          isError.value = true;
+          fail();
+        }
+      },
+    }),
   },
 ];
 
 const currentTabComponent = computed(
   () => tabs.find((tab) => tab.name === currentTab.value).component,
 );
+const getCurrentProps = computed(() => {
+  if (isError.value) {
+    return {
+      isShowButton: false,
+    };
+  }
+  return null;
+});
 </script>
 
 <style>
